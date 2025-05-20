@@ -1,0 +1,37 @@
+import TopProducts from "../components/TopProducts"
+
+export const imagePath = {
+    file: "/file.svg",
+    next: '/next.svg',
+    logo: '/green_update_logo.png',
+    user: '/user.jpg',
+    sales: '/sales.png',
+    purchase: '/purchase.png',
+    salesreturn: '/sales-return.png',
+    purchasereturn: '/purchase-return.png',
+    invoices: '/invoices.png',
+    canceled: '/canceled.png',
+    due: '/due.png',
+    delivered: '/delivered-invoice.png',
+    cart: '/cart.png',
+    overallinfo: '/letter-i.png',
+    customer: '/customer.png',
+    supplier: '/supplier.png',
+    order: '/checkout.png',
+    close: '/close.png',
+    topproduct: '/product-top.png'
+}
+
+export const sideBarIcon = {
+    dashboard: '/dashboard.png',
+    productmanage: '/product-manage.png',
+    product: '/productlist.png',
+    category: '/category.png',
+    subcategory: '/subcategory.png',
+    addproduct: '/add-product.png',
+    addcategory: '/add-category.png',
+    addsubcategory: '/add-subcategory.png',
+    greater: '/greater.png',
+    down: '/down.png'
+
+}
