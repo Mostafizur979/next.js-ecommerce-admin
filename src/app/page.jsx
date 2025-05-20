@@ -88,7 +88,7 @@ export default function Home() {
 
         {/* Dashboard Body */}
         <div className="w-full ml-[0px] md:ml-[252px]">
-          <div className="md:hidden bg-white my-0 px-4 shadow-sm grid grid-cols-2 items-center sticky top-0 z-40">
+          <div className="md:hidden bg-white my-0 px-4 shadow-sm grid grid-cols-2 items-center sticky top-0 bottom-2  z-40">
             <button onClick={() => {
               toggleSidebar("open");
             }} className={`${isSidebarOpen ? "hidden" : "block"}  text-[18px] text-[#FE9F43]`}>
@@ -116,7 +116,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[20px] p-[18px]">
             <div className="flex gap-[10px] bg-[#FE9F43] py-5 px-4 rounded-[5px]">
               <div className="bg-white p-[10px] rounded-[5px] ">
-                <Image src={imagePath.sales} height={24} width={24} />
+                <Image src={imagePath.sales} height={24} width={24} alt="icon"/>
               </div>
               <div>
                 <p className="text-[14px] font-['Poppins'] text-white">Total Sales</p>
@@ -125,7 +125,7 @@ export default function Home() {
             </div>
             <div className="flex gap-[10px] bg-[#092C4C] py-5 px-4 rounded-[5px]">
               <div className="bg-white p-[10px] rounded-[5px] ">
-                <Image src={imagePath.salesreturn} height={24} width={24} />
+                <Image src={imagePath.salesreturn} height={24} width={24} alt="icon"/>
               </div>
               <div>
                 <p className="text-[14px] font-['Poppins'] text-white">Total Sales Return</p>
@@ -134,7 +134,7 @@ export default function Home() {
             </div>
             <div className="flex gap-[10px] bg-[#0E9384] py-5 px-4 rounded-[5px]">
               <div className="bg-white p-[10px] rounded-[5px] ">
-                <Image src={imagePath.purchase} height={24} width={24} />
+                <Image src={imagePath.purchase} height={24} width={24} alt="icon" />
               </div>
               <div>
                 <p className="text-[14px] font-['Poppins'] text-white">Total Purchase</p>
@@ -143,7 +143,7 @@ export default function Home() {
             </div>
             <div className="flex gap-[10px] bg-[#155EEF] py-5 px-4 rounded-[5px]">
               <div className="bg-white p-[10px] rounded-[5px] ">
-                <Image src={imagePath.purchasereturn} height={24} width={24} />
+                <Image src={imagePath.purchasereturn} height={24} width={24} alt="icon"/>
               </div>
               <div>
                 <p className="text-[14px] font-['Poppins'] text-white">Total Purchase Return</p>
@@ -152,7 +152,7 @@ export default function Home() {
             </div>
             <div className="flex gap-[10px] bg-[#3A59D1] py-5 px-4 rounded-[5px]">
               <div className="bg-white p-[10px] rounded-[5px] ">
-                <Image src={imagePath.invoices} height={24} width={24} />
+                <Image src={imagePath.invoices} height={24} width={24} alt="icon" />
               </div>
               <div>
                 <p className="text-[14px] font-['Poppins'] text-white">Total Invoices</p>
@@ -161,7 +161,7 @@ export default function Home() {
             </div>
             <div className="flex gap-[10px] bg-[#3D90D7] py-5 px-4 rounded-[5px]">
               <div className="bg-white p-[10px] rounded-[5px] ">
-                <Image src={imagePath.canceled} height={24} width={24} />
+                <Image src={imagePath.canceled} height={24} width={24} alt="icon" />
               </div>
               <div>
                 <p className="text-[14px] font-['Poppins'] text-white">Canceled Invoices</p>
@@ -170,7 +170,7 @@ export default function Home() {
             </div>
             <div className="flex gap-[10px] bg-[#7AC6D2] py-5 px-4 rounded-[5px]">
               <div className="bg-white p-[10px] rounded-[5px] ">
-                <Image src={imagePath.due} height={24} width={24} />
+                <Image src={imagePath.due} height={24} width={24} alt="icon" />
               </div>
               <div>
                 <p className="text-[14px] font-['Poppins'] text-white">Pending Invoices</p>
@@ -179,7 +179,7 @@ export default function Home() {
             </div>
             <div className="flex gap-[10px] bg-[#1DCD9F] py-5 px-4 rounded-[5px]">
               <div className="bg-white p-[10px] rounded-[5px] ">
-                <Image src={imagePath.delivered} height={24} width={24} />
+                <Image src={imagePath.delivered} height={24} width={24} alt="icon" />
               </div>
               <div>
                 <p className="text-[14px] font-['Poppins'] text-white">Delivered Invoices</p>

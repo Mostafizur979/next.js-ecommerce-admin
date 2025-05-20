@@ -21,7 +21,7 @@ export default function TopProducts() {
                     <p className="text-[18px] font-semibold text-gray-600 font-['Poppins']">Top Selling Products</p>
                 </div>
                 {products.slice(0,5).map((product) => (
-                    <div className="flex gap-[10px] my-[10px] py-[10px] items-center border-b-[1px] border-gray-300">
+                    <div key={product.id} className="flex gap-[10px] my-[10px] py-[10px] items-center border-b-[1px] border-gray-300">
                         <img src={product.image} alt='product' height={48} width={48} />
                         <div>
                             <p className="font-['Poppins'] text-[14px] font-semibold text-gray-700">{product.title}</p>
