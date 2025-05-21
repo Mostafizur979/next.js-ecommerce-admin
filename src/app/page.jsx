@@ -103,7 +103,7 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-2 items-center">
             <div className="p-2">
-              <h1 className="text-[22px] font-bold text-black p-[10px] font-['Poppins']" id="head">Welcome, Admin</h1>
+              <h1 className="text-[22px] font-bold text-black p-[10px]  " id="head">Welcome, Admin</h1>
               <p className="text-[14px] px-[10px]">You have <span className="text-[#FE9F43]">200+</span> Orders, Today</p>
             </div>
             <div className="flex justify-end px-[18px]">
@@ -119,8 +119,8 @@ export default function Home() {
                 <Image src={imagePath.sales} height={24} width={24} alt="icon"/>
               </div>
               <div>
-                <p className="text-[14px] font-['Poppins'] text-white">Total Sales</p>
-                <p className="text-[18px] font-semibold font-['Poppins'] text-white flex items-center"><TbCurrencyTaka /> 48,988,078</p>
+                <p className="text-[14px]   text-white">Total Sales</p>
+                <p className="text-[18px] font-semibold   text-white flex items-center"><TbCurrencyTaka /> 48,988,078</p>
               </div>
             </div>
             <div className="flex gap-[10px] bg-[#092C4C] py-5 px-4 rounded-[5px]">
@@ -128,8 +128,8 @@ export default function Home() {
                 <Image src={imagePath.salesreturn} height={24} width={24} alt="icon"/>
               </div>
               <div>
-                <p className="text-[14px] font-['Poppins'] text-white">Total Sales Return</p>
-                <p className="text-[18px] font-semibold font-['Poppins'] text-white flex items-center"><TbCurrencyTaka />16,478,145</p>
+                <p className="text-[14px]   text-white">Total Sales Return</p>
+                <p className="text-[18px] font-semibold   text-white flex items-center"><TbCurrencyTaka />16,478,145</p>
               </div>
             </div>
             <div className="flex gap-[10px] bg-[#0E9384] py-5 px-4 rounded-[5px]">
@@ -137,8 +137,8 @@ export default function Home() {
                 <Image src={imagePath.purchase} height={24} width={24} alt="icon" />
               </div>
               <div>
-                <p className="text-[14px] font-['Poppins'] text-white">Total Purchase</p>
-                <p className="text-[18px] font-semibold font-['Poppins'] text-white flex items-center"><TbCurrencyTaka />26,478,145</p>
+                <p className="text-[14px]   text-white">Total Purchase</p>
+                <p className="text-[18px] font-semibold   text-white flex items-center"><TbCurrencyTaka />26,478,145</p>
               </div>
             </div>
             <div className="flex gap-[10px] bg-[#155EEF] py-5 px-4 rounded-[5px]">
@@ -146,8 +146,8 @@ export default function Home() {
                 <Image src={imagePath.purchasereturn} height={24} width={24} alt="icon"/>
               </div>
               <div>
-                <p className="text-[14px] font-['Poppins'] text-white">Total Purchase Return</p>
-                <p className="text-[18px] font-semibold font-['Poppins'] text-white flex items-center"><TbCurrencyTaka />18,478,145</p>
+                <p className="text-[14px]   text-white">Total Purchase Return</p>
+                <p className="text-[18px] font-semibold   text-white flex items-center"><TbCurrencyTaka />18,478,145</p>
               </div>
             </div>
             <div className="flex gap-[10px] bg-[#3A59D1] py-5 px-4 rounded-[5px]">
@@ -155,8 +155,8 @@ export default function Home() {
                 <Image src={imagePath.invoices} height={24} width={24} alt="icon" />
               </div>
               <div>
-                <p className="text-[14px] font-['Poppins'] text-white">Total Invoices</p>
-                <p className="text-[18px] font-semibold font-['Poppins'] text-white">11000</p>
+                <p className="text-[14px]   text-white">Total Invoices</p>
+                <p className="text-[18px] font-semibold   text-white">11000</p>
               </div>
             </div>
             <div className="flex gap-[10px] bg-[#3D90D7] py-5 px-4 rounded-[5px]">
@@ -164,8 +164,8 @@ export default function Home() {
                 <Image src={imagePath.canceled} height={24} width={24} alt="icon" />
               </div>
               <div>
-                <p className="text-[14px] font-['Poppins'] text-white">Canceled Invoices</p>
-                <p className="text-[18px] font-semibold font-['Poppins'] text-white">100</p>
+                <p className="text-[14px]   text-white">Canceled Invoices</p>
+                <p className="text-[18px] font-semibold   text-white">100</p>
               </div>
             </div>
             <div className="flex gap-[10px] bg-[#7AC6D2] py-5 px-4 rounded-[5px]">
@@ -173,8 +173,8 @@ export default function Home() {
                 <Image src={imagePath.due} height={24} width={24} alt="icon" />
               </div>
               <div>
-                <p className="text-[14px] font-['Poppins'] text-white">Pending Invoices</p>
-                <p className="text-[18px] font-semibold font-['Poppins'] text-white">800</p>
+                <p className="text-[14px]   text-white">Pending Invoices</p>
+                <p className="text-[18px] font-semibold   text-white">800</p>
               </div>
             </div>
             <div className="flex gap-[10px] bg-[#1DCD9F] py-5 px-4 rounded-[5px]">
@@ -182,8 +182,8 @@ export default function Home() {
                 <Image src={imagePath.delivered} height={24} width={24} alt="icon" />
               </div>
               <div>
-                <p className="text-[14px] font-['Poppins'] text-white">Delivered Invoices</p>
-                <p className="text-[18px] font-semibold font-['Poppins'] text-white">10000</p>
+                <p className="text-[14px]   text-white">Delivered Invoices</p>
+                <p className="text-[18px] font-semibold   text-white">10000</p>
               </div>
             </div>
           </div>
