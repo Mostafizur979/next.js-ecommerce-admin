@@ -36,11 +36,11 @@ export default function TopCategories() {
     const series = [44, 55, 13];
 
     return (
-        <div className="bg-white border border-gray-300 rounded-[10px] p-4">
+        <div className="bg-white rounded-xl shadow p-4">
             <div className="flex gap-[10px] items-center border-b border-gray-300 pb-[10px]">
                 <div className="bg-[#FFDBEC] p-[5px] rounded-[5px] ">
                     <img
-                        src={imagePath.topproduct}
+                        src={imagePath.topcategory}
                         className="h-[20px] w-[20px]"
                         alt="Top Product Icon"
                     />
@@ -61,7 +61,7 @@ export default function TopCategories() {
                 <p className="font-['Poppins'] text-[14px] font-semibold text-gray-600 pb-[10px]">Category Statistics</p>
                 <div className=" font-['Poppins'] text-[14px] border border-gray-300 rounded-[5px]">
                     <div className="border-b border-gray-300 grid grid-cols-2 p-[10px]"><p>Total Number Of Categories</p><p className="text-right">70</p></div>
-                    <div className="grid grid-cols-2 p-[10px]"><p>Total Number Of Products</p><p className="text-right">70</p></div>
+                    <div className="grid grid-cols-2 p-[10px]"><p>Total Number Of Products</p><p className="text-right">900</p></div>
                 </div>
             </div>
         </div>

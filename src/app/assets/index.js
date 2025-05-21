@@ -1,4 +1,3 @@
-import TopProducts from "../components/TopProducts"
 
 export const imagePath = {
     file: "/file.svg",
@@ -19,7 +18,10 @@ export const imagePath = {
     supplier: '/supplier.png',
     order: '/checkout.png',
     close: '/close.png',
-    topproduct: '/product-top.png'
+    topproduct: '/product-top.png',
+    warning: '/lowwarning.png',
+    topcategory: '/topcategory.png',
+    transaction: '/transfer.png'
 }
 
 export const sideBarIcon = {
