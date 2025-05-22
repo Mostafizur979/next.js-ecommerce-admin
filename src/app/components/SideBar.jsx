@@ -19,11 +19,10 @@ export default function SideBar({sidebarOpen}) {
 
     return (
         <>
-            <div className={`${sidebarOpen ? "block w-full mt-[35px]" : "hidden"
+            <div className={`${sidebarOpen ? "block w-full md:w-[252px] mt-[35px]" : "hidden"
                 } fixed z-50 md:block bg-white w-[252px] h-screen border-r border-gray-300`}>
-
                 {/* Logo */}
-                <div className={`${sidebarOpen ? "hidden" : "block"
+                <div className={`${sidebarOpen ? "hidden md:block" : "block"
                     } border-b-[1px] border-gray-300 py-4`}>
                     <Image src={imagePath.logo} alt="logo" width={235} height={48} />
                 </div>
@@ -63,7 +62,7 @@ export default function SideBar({sidebarOpen}) {
                         className={`overflow-hidden transition-all duration-500 ease-in-out ${isProductsOpen ? "max-h-[1000px]" : "max-h-0"} `}
                     >
                         <Link href="/productlist" className="px-4 py-2 text-[14px] text-gray-800 hover:bg-gray-200 hover:text-orange-400 flex gap-[5px] items-center"><Image src={sideBarIcon.product} alt="icon" height={16} width={16} /> Products</Link>
-                        <Link href="/" className="px-4 py-2 text-[14px] text-gray-800 hover:bg-gray-200 hover:text-orange-400 flex gap-[5px] items-center"><Image src={sideBarIcon.addproduct} alt="icon" height={16} width={16} /> Create Product</Link>
+                        <Link href="/createproduct" className="px-4 py-2 text-[14px] text-gray-800 hover:bg-gray-200 hover:text-orange-400 flex gap-[5px] items-center"><Image src={sideBarIcon.addproduct} alt="icon" height={16} width={16} /> Create Product</Link>
                         <Link href="/" className="px-4 py-2 text-[14px] text-gray-800 hover:bg-gray-200 hover:text-orange-400 flex gap-[5px] items-center"><Image src={sideBarIcon.category} alt="icon" height={16} width={16} /> Categories</Link>
                         <Link href="/" className="px-4 py-2 text-[14px] text-gray-800 hover:bg-gray-200 hover:text-orange-400 flex gap-[5px] items-center"><Image src={sideBarIcon.subcategory} alt="icon" height={16} width={16} /> Sub Categories</Link>
                         <Link href="/" className="px-4 py-2 text-[14px] text-gray-800 hover:bg-gray-200 hover:text-orange-400 flex gap-[5px] items-center"><Image src={sideBarIcon.addcategory} alt="icon" height={16} width={16} /> Create Categories</Link>
