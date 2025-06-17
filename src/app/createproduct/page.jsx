@@ -1,19 +1,20 @@
 'use client'
 import { useState, useEffect } from 'react';
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
-import { imagePath } from "@/app/assets";
+import { imagePath } from "@/assets";
 import Image from "next/image";
 import { FiPlusCircle } from "react-icons/fi";
 import Link from "next/link";
 import { FaArrowLeftLong } from "react-icons/fa6";
-import SideBar from "../components/SideBar";
-import Footer from '../components/footer';
+import SideBar from "../../components/SideBar";
+import Footer from '../../components/footer';
 import { FaChevronDown } from "react-icons/fa6";
 import { FaStarOfLife, FaRegEdit } from "react-icons/fa";
 import React from 'react';
 import ImageUploading from 'react-images-uploading';
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { MdOutlineCloudUpload } from "react-icons/md";
+import getCategories from '../../lib/getCategories';
 export default function ProductDetails() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [product, setProduct] = useState([]);
@@ -23,6 +24,18 @@ export default function ProductDetails() {
     const [isPricingInformationOpen, setIsPricingInformationOpen] = useState(true);
     const [isProductImageOpen, setIsProductImageOpen] = useState(true);
     const [isProductDescriptionOpen, setIsProductDescriptionOpen] = useState(true);
+    const [images, setImages] = useState([]);
+    const maxNumber = 5;
+    const [productCategory, setProductCategory] = useState([]);
+    const fetchCategories = async () => {
+        const data = await getCategories();
+        setProductCategory(data)
+    };
+
+    useEffect(() => {
+        fetchCategories();
+    }, []);
+
     const handleChange = (event) => {
         const name = event.target.name;
         const value = event.target.value;
@@ -66,17 +79,56 @@ export default function ProductDetails() {
             setIsProductDescriptionOpen(true);
         }
     }
-    const [images, setImages] = React.useState([]);
-    const maxNumber = 1;
 
     const onChange = (imageList, addUpdateIndex) => {
         console.log(imageList, addUpdateIndex);
         setImages(imageList);
-        console.log("Image: " + imageList);
     };
 
-    const formSubmit = ()=>{
-        console.log("submitted");
+    const formSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const res = await fetch('http://127.0.0.1:8000/api/createproduct/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    pname: inputs.pname,
+                    sku: inputs.sku,
+                    category: inputs.category,
+                    subcategory: inputs.subcategory,
+                    unit: inputs.unit,
+                    qty: inputs.qty,
+                    price: inputs.price,
+                    discountType: inputs.discountType,
+                    discountValue: inputs.discountValue,
+                    qtyAlert: inputs.qtyAlert,
+                    images: images[0]?.data_url,
+                    description: description
+                }),
+            });
+
+            const data = await res.json();
+
+            if (data.status === 'success') {
+                setInputs({});
+                setDescription("");
+                setImages([]);
+            } else {
+                alert(`Error: ${data.message}`);
+            }
+
+        } catch (error) {
+            console.error('Fetch error:', error);
+            alert('Failed to send data.');
+        }
+    }
+
+    const resetInput = () => {
+        setInputs({});
+        setDescription("");
+        setImages([]);
     }
 
 
@@ -165,10 +217,9 @@ export default function ProductDetails() {
                                         className="w-[100%] text-[14px] text-gray-600 p-[8px] outline-0 border-[1px] border-gray-200 rounded-[5px]"
                                     >
                                         <option value="Select">Select</option>
-                                        <option value="Electronics">Electronics</option>
-                                        <option value="Men's Clothing">Men's Clothing</option>
-                                        <option value="Women's Clothing">Women's Clothing</option>
-                                        <option value="Jewelary">Jewelary</option>
+                                        {productCategory.map((data, index) => (
+                                            <option key={index} value={data.name}>{data.name}</option>
+                                        ))}
                                     </select>
                                 </div>
                                 <div>
@@ -317,7 +368,7 @@ export default function ProductDetails() {
                                             // write your building UI
                                             <div className="upload__image-wrapper  flex items-center flex-wrap gap-[10px]">
                                                 <div
-                                                    
+
                                                     className='p-5  flex flex-col justify-center items-center border-[2px] border-dotted border-gray-300 h-[150px] w-[150px] rounded hover:bg-gray-100'
                                                     style={isDragging ? { color: 'red' } : undefined}
                                                     onClick={onImageUpload}
@@ -334,8 +385,8 @@ export default function ProductDetails() {
                                                     <div key={index} className="image-item p-[10px]  ">
                                                         <img src={image['data_url']} alt="" className='border border-gray-300 p-2 h-[100px] w-[100px]' />
                                                         <div className="image-item__btn-wrapper mt-3 flex justify-between gap-[10px]">
-                                                            <div onClick={() => onImageUpdate(index)} className='text-[#FE9F43] p-2 border border-gray-200 rounded hover:bg-[#FE9F43] hover:text-white'><FaRegEdit size={20} /></div>
-                                                            <div onClick={() => onImageRemove(index)} className='text-red-500 p-2 border border-gray-200 rounded hover:bg-red-500 hover:text-white'><RiDeleteBin6Line size={20} /></div>
+                                                            <div onClick={() => onImageUpdate(index)} className='text-[#FE9F43] p-2 border border-gray-200 rounded hover:bg-[#FE9F43] hover:text-white'><FaRegEdit size={15} /></div>
+                                                            <div onClick={() => onImageRemove(index)} className='text-red-500 p-2 border border-gray-200 rounded hover:bg-red-500 hover:text-white'><RiDeleteBin6Line size={15} /></div>
                                                         </div>
                                                     </div>
                                                 ))}
@@ -371,8 +422,8 @@ export default function ProductDetails() {
                             </div>
                         </div>
                         <div className='flex gap-3 justify-end mt-5'>
-                            <button type="reset" className='bg-red-500 px-4 py-2 text-white rounded'>Cancel</button>
-                            <button type="submit" className='bg-[#FE9F43] px-4 py-2 text-white rounded'> Submit</button>
+                            <button onClick={resetInput} type="reset" className='bg-[#051A2D] border border-[#051A2D] px-4 py-2 text-white rounded duration-200 hover:text-[#051A2D] hover:bg-white'>Cancel</button>
+                            <button type="submit" className='bg-[#FE9F43] border border-[#FE9F43] px-4 py-2 text-white rounded duration-200 hover:text-[#FE9F43] hover:bg-white'> Submit</button>
                         </div>
                     </form>
                 </div>

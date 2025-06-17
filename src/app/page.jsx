@@ -1,25 +1,25 @@
 'use client'
 import Image from "next/image";
-import { imagePath } from "./assets";
-import { sideBarIcon } from "./assets";
+import { imagePath } from "../assets";
+import { sideBarIcon } from "../assets";
 import { FaChevronDown } from "react-icons/fa";
 import { FaChevronRight } from "react-icons/fa6";
 import { TbCurrencyTaka } from "react-icons/tb";
 import { useState, useRef } from 'react';
 import Link from "next/link";
 import { MdOutlineDateRange } from "react-icons/md";
-import SalesPurchaseBar from "./components/sales&purchase";
-import OverAllInfo from "./components/OverAllInfo";
-import TopProducts from "./components/TopProducts";
-import LowStockProducts from "./components/Lowstock";
-import RecentSales from "./components/RecentSales";
-import SalesStatistics from "./components/SalesStatistics";
-import RecentTransaction from "./components/RecentTransaction";
-import TopCustomers from "./components/TopCustomers";
-import TopCategories from "./components/TopCategories";
-import OrderStatistics from "./components/OrderStatistics";
-import SideBar from "./components/SideBar";
-import Footer from "./components/footer";
+import SalesPurchaseBar from "../components/sales&purchase";
+import OverAllInfo from "../components/OverAllInfo";
+import TopProducts from "../components/TopProducts";
+import LowStockProducts from "../components/Lowstock";
+import RecentSales from "../components/RecentSales";
+import SalesStatistics from "../components/SalesStatistics";
+import RecentTransaction from "../components/RecentTransaction";
+import TopCustomers from "../components/TopCustomers";
+import TopCategories from "../components/TopCategories";
+import OrderStatistics from "../components/OrderStatistics";
+import SideBar from "../components/SideBar";
+import Footer from "../components/footer";
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
 export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -160,7 +160,7 @@ export default function Home() {
                 <SalesStatistics />
               </div>
               <div className="col-span-2 lg:col-span-1">
-                <RecentTransaction />
+                <RecentTransaction />naeem1234
               </div>
             </div>
             <div className="col-span-3 grid grid-cols-3 gap-[20px]">

@@ -1,14 +1,14 @@
 'use client'
-import SideBar from "../../components/SideBar";
-import Footer from "../../components/footer";
+import SideBar from "../../../components/SideBar";
+import Footer from "../../../components/footer";
 import { useState, useEffect } from 'react';
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
-import { imagePath } from "@/app/assets";
+import { imagePath } from "@/assets";
 import Image from "next/image";
-import getTopProducts from "../../lib/getProducts";
+import getTopProducts from "../../../lib/getProducts";
 import { FiPlusCircle } from "react-icons/fi";
 import Link from "next/link";
-import getProductDetails from "@/app/lib/getProductDetails";
+import getProductDetails from "@/lib/getProductDetails";
 import { useParams } from 'next/navigation';
 export default function ProductDetails() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);

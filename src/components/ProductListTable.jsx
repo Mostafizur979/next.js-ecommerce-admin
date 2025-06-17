@@ -9,17 +9,18 @@ export default function ProductListTable({ data, index }) {
     return (
         <tr className="border-b-[1px] border-gray-300">
             <td className="p-2 py-4 pl-6">{index + 1}</td>
-            <td className="p-2">{data.id}</td>
+            <td className="p-2">{data.SKU}</td>
             <td className="flex items-center gap-[5px] p-2">
                 <div className="p-[5px] bg-[#F2F2F2] rounded-[5px]">
-                    <img src={data.image} className="h-[20px] w-[20px]" alt="product" />
+                    {/* <img src={data.image} className="h-[20px] w-[20px]" alt="product" /> */}
+                    <img src={`data:image/png;base64,${data.Image}`} className="h-[20px] w-[20px]" alt="product" />
                 </div>
-                {data.title.length > 15 ? data.title.slice(0, 15) + '...' : data.title}
+                {data.Pname.length > 15 ? data.Pname.slice(0, 15) + '...' : data.Pname}
             </td>
-            <td className="p-2">{data.category}</td>
-            <td className="p-2">{data.price}</td>
-            <td className="p-2">Pc</td>
-            <td className="p-2">100</td>
+            <td className="p-2">{data.Category}</td>
+            <td className="p-2">{data.Price}</td>
+            <td className="p-2">{data.Unit}</td>
+            <td className="p-2">{data.Qty}</td>
             <td className="flex items-center gap-[5px] p-2">
                 <img src={imagePath.user} height={20} width={20} alt="user" />
                 John Doe

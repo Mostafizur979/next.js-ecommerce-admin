@@ -1,15 +1,15 @@
 'use client'
-import SideBar from "../components/SideBar";
-import Footer from "../components/footer";
+import SideBar from "../../components/SideBar";
+import Footer from "../../components/footer";
 import { useState, useEffect } from 'react';
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
-import { imagePath } from "../assets";
+import { imagePath } from "../../assets";
 import Image from "next/image";
-import getCategories from "../lib/getCategories";
-import getTopProducts from "../lib/getProducts";
+import getCategories from "../../lib/getCategories";
+import getProducts from "../../lib/getProductList";
 import { PiLessThanThin, PiGreaterThanThin } from "react-icons/pi";
 import { FiPlusCircle } from "react-icons/fi";
-import ProductListTable from "../components/ProductListTable";
+import ProductListTable from "../../components/ProductListTable";
 import Link from "next/link";
 
 export default function ProductList() {
@@ -25,7 +25,8 @@ export default function ProductList() {
     useEffect(() => {
         async function fetchData() {
             const data = await getCategories();
-            const productData = await getTopProducts();
+            const productData = await getProducts();
+            console.log("data ",productData);
             setProduct(productData);
             setCategories(data);
             setFilteredProduct(productData); // Initial value
@@ -42,13 +43,13 @@ export default function ProductList() {
 
         if (searchData.trim() !== "") {
             result = result.filter((prod) =>
-                prod.title.toLowerCase().includes(searchData.toLowerCase())
+                prod.Pname.toLowerCase().includes(searchData.toLowerCase())
             );
         }
 
         if (category !== "all") {
             result = result.filter((prod) =>
-                prod.category.toLowerCase() === category.toLowerCase()
+                prod.Category.toLowerCase() === category.toLowerCase()
             );
         }
 
@@ -109,7 +110,7 @@ export default function ProductList() {
                                 >
                                     <option value="all">All</option>
                                     {categories.map((cat, index) => (
-                                        <option key={index} value={cat}>{cat}</option>
+                                        <option key={index} value={cat.name}>{cat.name}</option>
                                     ))}
                                 </select>
                             </div>
@@ -134,7 +135,7 @@ export default function ProductList() {
                                 <tbody>
                                     {paginatedData.map((data, index) => (
                                         <ProductListTable
-                                            key={data.id}
+                                            key={index}
                                             data={data}
                                             index={startIndex + index}
                                         />

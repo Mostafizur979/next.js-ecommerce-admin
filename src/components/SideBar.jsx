@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { sideBarIcon } from '../assets';
 import { FaChevronDown } from "react-icons/fa";
 import { FaChevronRight } from "react-icons/fa6";
-import { HiOutlineMenuAlt3 } from "react-icons/hi";
 import Image from 'next/image';
 
 export default function SideBar({sidebarOpen}) {
@@ -49,7 +48,7 @@ export default function SideBar({sidebarOpen}) {
                     <div onClick={toggleProducts} className="grid grid-cols-2 items-center cursor-pointer hover:bg-gray-200 hover:text-orange-400">
                         <div className="flex gap-[5px] px-4 py-2 items-center text-[14px] duration-300">
                             <Image src={sideBarIcon.productmanage} alt="icon" height={16} width={16} />
-                            Products
+                             Inventory
                         </div>
                         <div className="flex justify-end pr-[10px]">
                             {isProductsOpen ? <FaChevronDown size={14} /> : <FaChevronRight size={14} />}
@@ -63,7 +62,7 @@ export default function SideBar({sidebarOpen}) {
                     >
                         <Link href="/productlist" className="px-4 py-2 text-[14px] text-gray-800 hover:bg-gray-200 hover:text-orange-400 flex gap-[5px] items-center"><Image src={sideBarIcon.product} alt="icon" height={16} width={16} /> Products</Link>
                         <Link href="/createproduct" className="px-4 py-2 text-[14px] text-gray-800 hover:bg-gray-200 hover:text-orange-400 flex gap-[5px] items-center"><Image src={sideBarIcon.addproduct} alt="icon" height={16} width={16} /> Create Product</Link>
-                        <Link href="/" className="px-4 py-2 text-[14px] text-gray-800 hover:bg-gray-200 hover:text-orange-400 flex gap-[5px] items-center"><Image src={sideBarIcon.category} alt="icon" height={16} width={16} /> Categories</Link>
+                        <Link href="/category" className="px-4 py-2 text-[14px] text-gray-800 hover:bg-gray-200 hover:text-orange-400 flex gap-[5px] items-center"><Image src={sideBarIcon.category} alt="icon" height={16} width={16} /> Categories</Link>
                         <Link href="/" className="px-4 py-2 text-[14px] text-gray-800 hover:bg-gray-200 hover:text-orange-400 flex gap-[5px] items-center"><Image src={sideBarIcon.subcategory} alt="icon" height={16} width={16} /> Sub Categories</Link>
                         <Link href="/" className="px-4 py-2 text-[14px] text-gray-800 hover:bg-gray-200 hover:text-orange-400 flex gap-[5px] items-center"><Image src={sideBarIcon.addcategory} alt="icon" height={16} width={16} /> Create Categories</Link>
                         <Link href="/" className="px-4 py-2 text-[14px] text-gray-800 hover:bg-gray-200 hover:text-orange-400 flex gap-[5px] items-center"><Image src={sideBarIcon.addsubcategory} alt="icon" height={16} width={16} /> Create SubCategories</Link>
