@@ -1,23 +1,24 @@
 'use client'
-import SideBar from "../../../components/SideBar";
-import Footer from "../../../components/footer";
+import SideBar from "../../components/SideBar";
+import Footer from "../../components/footer";
 import { useState, useEffect } from 'react';
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
 import { imagePath } from "@/assets";
 import Image from "next/image";
-import getTopProducts from "../../../lib/getProducts";
 import { FiPlusCircle } from "react-icons/fi";
 import Link from "next/link";
 import getProductDetails from "@/lib/getProductDetails";
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 export default function ProductDetails() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [product, setProduct] = useState([]);
     const params = useParams();
-    const id = params.id;
+    const searchParams = useSearchParams();
+    const id = searchParams.get("id");
     useEffect(() => {
         async function fetchData() {
             const productData = await getProductDetails(id);
+            console.log(productData)
             setProduct(productData);
 
         }
@@ -66,36 +67,40 @@ export default function ProductDetails() {
                                     <tbody>
                                         <tr>
                                             <td className="p-2 border border-gray-300 ">Product</td>
-                                            <td className="p-2 border border-gray-300">{product.title}</td>
+                                            <td className="p-2 border border-gray-300">{product[0] ? product[0].Pname : "-----"}</td>
                                         </tr>
                                         <tr>
                                             <td className="p-2 border border-gray-300 ">Category</td>
-                                            <td className="p-2 border border-gray-300">{product.category}</td>
+                                            <td className="p-2 border border-gray-300">{product[0] ? product[0].Category : "-----"}</td>
                                         </tr>
                                         <tr>
                                             <td className="p-2 border border-gray-300 ">Sub Category</td>
-                                            <td className="p-2 border border-gray-300">None</td>
+                                            <td className="p-2 border border-gray-300">{product[0] ? product[0].SubCategory : "-----"}</td>
                                         </tr>
                                         <tr>
                                             <td className="p-2 border border-gray-300 ">Unit</td>
-                                            <td className="p-2 border border-gray-300">Piece</td>
+                                            <td className="p-2 border border-gray-300">{product[0] ? product[0].Unit : "-----"}</td>
                                         </tr>
                                         <tr>
-                                            <td className="p-2 border border-gray-300 ">Minimum Quantity</td>
-                                            <td className="p-2 border border-gray-300">5</td>
+                                            <td className="p-2 border border-gray-300 ">Quantity Alert</td>
+                                            <td className="p-2 border border-gray-300">{product[0] ? product[0].QtyAlert : "-----"}</td>
                                         </tr>
 
                                         <tr>
                                             <td className="p-2 border border-gray-300 ">Quantity</td>
-                                            <td className="p-2 border border-gray-300">50</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="p-2 border border-gray-300 ">Tax</td>
-                                            <td className="p-2 border border-gray-300">0.0%</td>
+                                            <td className="p-2 border border-gray-300">{product[0] ? product[0].Qty : "-----"}</td>
                                         </tr>
                                         <tr>
                                             <td className="p-2 border border-gray-300 ">Price</td>
-                                            <td className="p-2 border border-gray-300">{product.price}</td>
+                                            <td className="p-2 border border-gray-300">{product[0] ? product[0].Price : "-----"}</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="p-2 border border-gray-300 ">Discount Type</td>
+                                            <td className="p-2 border border-gray-300">{product[0] ? product[0].DiscountType : "-----"}</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="p-2 border border-gray-300 ">Discount Value</td>
+                                            <td className="p-2 border border-gray-300">{product[0] ? product[0].DiscountValue : "-----"}</td>
                                         </tr>
                                         <tr>
                                             <td className="p-2 border border-gray-300 ">Status</td>
@@ -103,13 +108,13 @@ export default function ProductDetails() {
                                         </tr>
                                         <tr>
                                             <td className="p-2 border border-gray-300 ">Description</td>
-                                            <td className="p-2 border border-gray-300">{product.description}</td>
+                                            <td className="p-2 border border-gray-300">{product[0] ? product[0].Description : "-----"}</td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
                             <div className="col-span-3 order-1 lg:col-span-1 lg:order-2 flex justify-center items-center border border-gray-300 mr-[10px] my-[10px]">
-                                <img src={product.image} className="h-[300px] w-[300px] object-fit" alt="product"/>
+                                <img src={`data:image/png;base64,${product[0] && product[0].Image }`} className="h-[300px] w-[300px] object-fit" alt="product" />
                             </div>
                         </div>
                     </div>

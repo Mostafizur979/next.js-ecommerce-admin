@@ -27,7 +27,7 @@ export default function ProductListTable({ data, index }) {
             </td>
             <td className="p-2 w-[150px]">
                 <div className="flex gap-[10px]">
-                    <Link href={`/productdetails/${data.id}`}
+                    <Link href={{ pathname: "/productdetails/", query: { id: data.SKU } }}
                         className='p-[5px] border-[1px] border-gray-300 rounded duration-300 hover:bg-[#FE9F43] hover:text-white'>
                         <MdOutlineRemoveRedEye />
                     </Link>

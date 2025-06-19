@@ -160,7 +160,7 @@ export default function Home() {
                 <SalesStatistics />
               </div>
               <div className="col-span-2 lg:col-span-1">
-                <RecentTransaction />naeem1234
+                <RecentTransaction />
               </div>
             </div>
             <div className="col-span-3 grid grid-cols-3 gap-[20px]">
