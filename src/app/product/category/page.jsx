@@ -1,16 +1,16 @@
 'use client';
-import SideBar from "../../components/SideBar";
-import Footer from "../../components/footer";
+import SideBar from "../../../components/SideBar";
+import Footer from "../../../components/footer";
 import { useState, useEffect } from 'react';
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
-import { imagePath } from "../../assets";
+import { imagePath } from "../../../assets";
 import Image from "next/image";
 import { PiLessThanThin, PiGreaterThanThin } from "react-icons/pi";
 import { FiPlusCircle } from "react-icons/fi";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { FaStarOfLife } from "react-icons/fa";
-import CategoryListTable from "../../components/CategoryListTable";
-import getCategories from "../../lib/getCategories";
+import CategoryListTable from "../../../components/CategoryListTable";
+import getCategories from "../../../lib/getCategories";
 export default function Category() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [searchData, setSearchData] = useState('');

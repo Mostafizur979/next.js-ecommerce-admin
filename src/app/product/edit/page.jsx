@@ -6,15 +6,17 @@ import Image from "next/image";
 import { FiPlusCircle } from "react-icons/fi";
 import Link from "next/link";
 import { FaArrowLeftLong } from "react-icons/fa6";
-import SideBar from "../../components/SideBar";
-import Footer from '../../components/footer';
+import SideBar from "../../../components/SideBar";
+import Footer from '../../../components/footer';
 import { FaChevronDown } from "react-icons/fa6";
 import { FaStarOfLife, FaRegEdit } from "react-icons/fa";
 import React from 'react';
 import ImageUploading from 'react-images-uploading';
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { MdOutlineCloudUpload } from "react-icons/md";
-import getCategories from '../../lib/getCategories';
+import getCategories from '../../../lib/getCategories';
+import { useSearchParams } from 'next/navigation';
+import getProductDetails from '@/lib/getProductDetails';
 export default function ProductDetails() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [product, setProduct] = useState([]);
@@ -27,10 +29,36 @@ export default function ProductDetails() {
     const [images, setImages] = useState([]);
     const maxNumber = 5;
     const [productCategory, setProductCategory] = useState([]);
+    const searchParams = useSearchParams();
+    const id = searchParams.get("id");
     const fetchCategories = async () => {
         const data = await getCategories();
         setProductCategory(data)
     };
+    useEffect(() => {
+        const fetchProduct = async () => {
+            const productData = await getProductDetails(id);
+
+            setInputs({
+                pname: productData[0].Pname || '',
+                sku: productData[0].SKU || '',
+                category: productData[0].Category || '',
+                subcategory: productData[0].SubCategory || '',
+                unit: productData[0].Unit || '',
+                qty: productData[0].Qty || '',
+                price: productData[0].Price || '',
+                discountType: productData[0].DiscountType || '',
+                discountValue: productData[0].DiscountValue || '',
+                qtyAlert: productData.QtyAlert || '',
+            });
+            // Optional: if you want to store the image and description separately
+            setImages([{ data_url: productData[0].Image }]);
+            setDescription(productData[0].Description || '');
+        };
+
+        fetchProduct();
+    }, [id]);
+
 
     useEffect(() => {
         fetchCategories();
@@ -150,17 +178,17 @@ export default function ProductDetails() {
                 <div className="w-full p-[18px]">
                     <div className="grid grid-cols-2 pb-[10px]">
                         <div>
-                            <h1 className="text-[18px] text-gray-800 font-semibold">Create Product</h1>
-                            <p className="text-[14px] text-gray-600">Create new product</p>
+                            <h1 className="text-[18px] text-gray-800 font-semibold">Edit Product</h1>
+                            <p className="text-[14px] text-gray-600">Update product information</p>
                         </div>
                         <div className="flex gap-[10px] justify-end">
-                            <Link href="">
+                            <Link href="/product/category">
                                 <div className="bg-[#FE9F43] flex items-center text-white text-[14px] gap-[5px] p-[10px] rounded-[5px]">
                                     <FiPlusCircle size={12} />
                                     <p>Add Category</p>
                                 </div>
                             </Link>
-                            <Link href="/productlist">
+                            <Link href="/product/list">
                                 <div className="bg-[#051A2D] flex items-center text-white text-[14px] gap-[5px] p-[10px] rounded-[5px]">
                                     <FaArrowLeftLong size={12} />
                                     <p>Back to Product</p>
@@ -383,7 +411,7 @@ export default function ProductDetails() {
 
                                                 {imageList.map((image, index) => (
                                                     <div key={index} className="image-item p-[10px]  ">
-                                                        <img src={image['data_url']} alt="" className='border border-gray-300 p-2 h-[100px] w-[100px]' />
+                                                        <img src={`data:image/png;base64,${images[0] && images[0]?.data_url}`} alt="" className='border border-gray-300 p-2 h-[100px] w-[100px]' />
                                                         <div className="image-item__btn-wrapper mt-3 flex justify-between gap-[10px]">
                                                             <div onClick={() => onImageUpdate(index)} className='text-[#FE9F43] p-2 border border-gray-200 rounded hover:bg-[#FE9F43] hover:text-white'><FaRegEdit size={15} /></div>
                                                             <div onClick={() => onImageRemove(index)} className='text-red-500 p-2 border border-gray-200 rounded hover:bg-red-500 hover:text-white'><RiDeleteBin6Line size={15} /></div>

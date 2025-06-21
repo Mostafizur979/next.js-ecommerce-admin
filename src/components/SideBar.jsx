@@ -60,9 +60,9 @@ export default function SideBar({sidebarOpen}) {
                     
                         className={`overflow-hidden transition-all duration-500 ease-in-out ${isProductsOpen ? "max-h-[1000px]" : "max-h-0"} `}
                     >
-                        <Link href="/productlist" className="px-4 py-2 text-[14px] text-gray-800 hover:bg-gray-200 hover:text-orange-400 flex gap-[5px] items-center"><Image src={sideBarIcon.product} alt="icon" height={16} width={16} /> Products</Link>
-                        <Link href="/createproduct" className="px-4 py-2 text-[14px] text-gray-800 hover:bg-gray-200 hover:text-orange-400 flex gap-[5px] items-center"><Image src={sideBarIcon.addproduct} alt="icon" height={16} width={16} /> Create Product</Link>
-                        <Link href="/category" className="px-4 py-2 text-[14px] text-gray-800 hover:bg-gray-200 hover:text-orange-400 flex gap-[5px] items-center"><Image src={sideBarIcon.category} alt="icon" height={16} width={16} /> Categories</Link>
+                        <Link href="/product/list" className="px-4 py-2 text-[14px] text-gray-800 hover:bg-gray-200 hover:text-orange-400 flex gap-[5px] items-center"><Image src={sideBarIcon.product} alt="icon" height={16} width={16} /> Products</Link>
+                        <Link href="/product/new" className="px-4 py-2 text-[14px] text-gray-800 hover:bg-gray-200 hover:text-orange-400 flex gap-[5px] items-center"><Image src={sideBarIcon.addproduct} alt="icon" height={16} width={16} /> Create Product</Link>
+                        <Link href="/product/category" className="px-4 py-2 text-[14px] text-gray-800 hover:bg-gray-200 hover:text-orange-400 flex gap-[5px] items-center"><Image src={sideBarIcon.category} alt="icon" height={16} width={16} /> Categories</Link>
                         <Link href="/" className="px-4 py-2 text-[14px] text-gray-800 hover:bg-gray-200 hover:text-orange-400 flex gap-[5px] items-center"><Image src={sideBarIcon.subcategory} alt="icon" height={16} width={16} /> Sub Categories</Link>
                         <Link href="/" className="px-4 py-2 text-[14px] text-gray-800 hover:bg-gray-200 hover:text-orange-400 flex gap-[5px] items-center"><Image src={sideBarIcon.addcategory} alt="icon" height={16} width={16} /> Create Categories</Link>
                         <Link href="/" className="px-4 py-2 text-[14px] text-gray-800 hover:bg-gray-200 hover:text-orange-400 flex gap-[5px] items-center"><Image src={sideBarIcon.addsubcategory} alt="icon" height={16} width={16} /> Create SubCategories</Link>

@@ -1,15 +1,15 @@
 'use client'
-import SideBar from "../../components/SideBar";
-import Footer from "../../components/footer";
+import SideBar from "../../../components/SideBar";
+import Footer from "../../../components/footer";
 import { useState, useEffect } from 'react';
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
-import { imagePath } from "../../assets";
+import { imagePath } from "../../../assets";
 import Image from "next/image";
-import getCategories from "../../lib/getCategories";
-import getProducts from "../../lib/getProductList";
+import getCategories from "../../../lib/getCategories";
+import getProducts from "../../../lib/getProductList";
 import { PiLessThanThin, PiGreaterThanThin } from "react-icons/pi";
 import { FiPlusCircle } from "react-icons/fi";
-import ProductListTable from "../../components/ProductListTable";
+import ProductListTable from "../../../components/ProductListTable";
 import Link from "next/link";
 
 export default function ProductList() {
@@ -83,7 +83,7 @@ export default function ProductList() {
                             <p className="text-[14px] text-gray-600">Manage your products</p>
                         </div>
                         <div className="flex justify-end">
-                            <Link href="/createproduct">
+                            <Link href="/product/new">
                                 <div className="bg-[#FE9F43] flex items-center text-white text-[14px] gap-[5px] p-[10px] rounded-[5px]">
                                     <FiPlusCircle size={12} />
                                     <p>Add Product</p>

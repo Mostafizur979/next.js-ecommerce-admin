@@ -1,6 +1,6 @@
 'use client'
-import SideBar from "../../components/SideBar";
-import Footer from "../../components/footer";
+import SideBar from "../../../components/SideBar";
+import Footer from "../../../components/footer";
 import { useState, useEffect } from 'react';
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
 import { imagePath } from "@/assets";
@@ -12,7 +12,6 @@ import { useParams, useSearchParams } from 'next/navigation';
 export default function ProductDetails() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [product, setProduct] = useState([]);
-    const params = useParams();
     const searchParams = useSearchParams();
     const id = searchParams.get("id");
     useEffect(() => {
@@ -51,7 +50,7 @@ export default function ProductDetails() {
                             <p className="text-[14px] text-gray-600">Full details of product</p>
                         </div>
                         <div className="flex justify-end">
-                            <Link href="">
+                            <Link href={{ pathname: "/product/edit/", query: { id: product[0]?.SKU } }}>
                                 <div className="bg-[#FE9F43] flex items-center text-white text-[14px] gap-[5px] p-[10px] rounded-[5px]">
                                     <FiPlusCircle size={12} />
                                     <p>Edit Product</p>
