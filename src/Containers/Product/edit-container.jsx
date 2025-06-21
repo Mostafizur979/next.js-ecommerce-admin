@@ -14,7 +14,7 @@ import React from 'react';
 import ImageUploading from 'react-images-uploading';
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { MdOutlineCloudUpload } from "react-icons/md";
-import getCategories from '../../../lib/getCategories';
+import getCategories from '@/lib/getCategories';
 import { useSearchParams } from 'next/navigation';
 import getProductDetails from '@/lib/getProductDetails';
 export default function ProductUpdate() {
