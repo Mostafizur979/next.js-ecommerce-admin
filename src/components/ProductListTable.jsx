@@ -6,6 +6,20 @@ import { imagePath } from '../assets';
 import Link from 'next/link';
 import Swal from 'sweetalert2'
 export default function ProductListTable({ data, index }) {
+    async function deleteProduct(sku) {
+                        alert(sku)
+        const res = await fetch('http://127.0.0.1:8000/api/getproducts/', {
+            method: "DELETE",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        
+            body: JSON.stringify({
+                sku: sku
+            }),
+        });
+
+    }
     return (
         <tr className="border-b-[1px] border-gray-300">
             <td className="p-2 py-4 pl-6">{index + 1}</td>
@@ -31,10 +45,10 @@ export default function ProductListTable({ data, index }) {
                         className='p-[5px] border-[1px] border-gray-300 rounded duration-300 hover:bg-[#FE9F43] hover:text-white'>
                         <MdOutlineRemoveRedEye />
                     </Link>
-                     <Link href={{ pathname: "/product/edit/", query: { id: data?.SKU } }}
-                           className='p-[5px] border-[1px] border-gray-300 rounded duration-300 hover:bg-[#FE9F43] hover:text-white'>
-                                <FaRegEdit />   
-                     </Link>
+                    <Link href={{ pathname: "/product/edit/", query: { id: data?.SKU } }}
+                        className='p-[5px] border-[1px] border-gray-300 rounded duration-300 hover:bg-[#FE9F43] hover:text-white'>
+                        <FaRegEdit />
+                    </Link>
                     <div onClick={() => {
                         Swal.fire({
                             title: "Are you sure?",
@@ -46,6 +60,7 @@ export default function ProductListTable({ data, index }) {
                             confirmButtonText: "Yes, delete it!"
                         }).then((result) => {
                             if (result.isConfirmed) {
+                                deleteProduct(data?.SKU)
                                 Swal.fire({
                                     title: "Deleted!",
                                     text: "Your product has been deleted.",

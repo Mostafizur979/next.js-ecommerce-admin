@@ -7,13 +7,14 @@ import { FiPlusCircle } from "react-icons/fi";
 import Link from "next/link";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import SideBar from "@/components/SideBar";
-import Footer from "@/components/footer";
+import Footer from '@/components/footer';
 import { FaChevronDown } from "react-icons/fa6";
 import { FaStarOfLife, FaRegEdit } from "react-icons/fa";
 import React from 'react';
 import ImageUploading from 'react-images-uploading';
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { MdOutlineCloudUpload } from "react-icons/md";
+import getCategories from '@/lib/getCategories';
 import getCategories from '@/lib/getCategories';
 import { useSearchParams } from 'next/navigation';
 import getProductDetails from '@/lib/getProductDetails';
@@ -116,8 +117,8 @@ export default function ProductUpdate() {
     const formSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch('http://127.0.0.1:8000/api/createproduct/', {
-                method: 'POST',
+            const res = await fetch('http://127.0.0.1:8000/api/getproducts/', {
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
