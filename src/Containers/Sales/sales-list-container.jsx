@@ -1,38 +1,32 @@
 'use client'
-import SideBar from "../../../components/SideBar";
-import Footer from "../../../components/footer";
+import SideBar from "@/components/SideBar";
+import Footer from "@/components/footer";
 import { useState, useEffect } from 'react';
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
-import { imagePath } from "../../../assets";
+import { imagePath } from "@/assets";
 import Image from "next/image";
-import getCategories from "../../../lib/getCategories";
-import getProducts from "../../../lib/getProductList";
+import getCategories from "@/lib/getCategories";
+import getProducts from "@/lib/getProductList";
 import { PiLessThanThin, PiGreaterThanThin } from "react-icons/pi";
 import { FiPlusCircle } from "react-icons/fi";
-import ProductListTable from "../../../components/ProductListTable";
+import ProductListTable from "@/components/ProductListTable";
 import Link from "next/link";
-export default function ProductList() {
+
+export default function SalesList() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [searchData, setSearchData] = useState('');
     const [category, setCategory] = useState('all');
     const [categories, setCategories] = useState([]);
     const [product, setProduct] = useState([]);
     const [filteredProduct, setFilteredProduct] = useState([]);
-    const [totalPages, setTotalPages] = useState(0);
-    const [startIndex, setStartIndex] = useState(0);
-    const [paginatedData, setPaginatedData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [numOfRows, setNumOfRows] = useState("5");
-    const handleChange = (event) => {
-        setNumOfRows(event.target.value)
-        setCurrentPage(1);
-    }
+    const itemsPerPage = 10;
 
     useEffect(() => {
         async function fetchData() {
             const data = await getCategories();
             const productData = await getProducts();
-            console.log("data ", productData);
+            console.log("data ",productData);
             setProduct(productData);
             setCategories(data);
             setFilteredProduct(productData); // Initial value
@@ -63,15 +57,9 @@ export default function ProductList() {
         setCurrentPage(1); // Reset page on filter
     }, [searchData, category, product]);
 
-    useEffect(() => {
-        const itemsPerPage = parseInt(numOfRows);
-        const total = Math.ceil(filteredProduct.length / itemsPerPage);
-        const start = (currentPage - 1) * itemsPerPage;
-        const paginated = filteredProduct.slice(start, start + itemsPerPage);
-        setTotalPages(total);
-        setStartIndex(start);
-        setPaginatedData(paginated);
-    }, [filteredProduct, currentPage, numOfRows]);
+    const totalPages = Math.ceil(filteredProduct.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const paginatedData = filteredProduct.slice(startIndex, startIndex + itemsPerPage);
 
     return (
         <div className="w-full flex gap-[20px] bg-[#F7F7F7]">
@@ -157,41 +145,30 @@ export default function ProductList() {
                         </div>
 
                         {/* Pagination */}
-                        <div className="flex justify-between items-center">
-                            <div className="flex gap-2 ml-4 text-[14px]">
-                                <p>Item Per Page</p>
-                                <div>
-                                    <select value={numOfRows} onChange={handleChange} className="border-[1px] border-gray-400 rounded-[5px] outline-0">
-                                        <option vlaue="1">1</option>
-                                        <option vlaue="5">5</option>
-                                        <option value="10">10</option>
-                                        <option value="25">25</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div className="text-gray-800 text-sm flex gap-2 items-center justify-end p-4">
-                                <button
-                                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                                    className="h-8 w-8 flex items-center justify-center rounded-full bg-gray-200"
+                        <div className="text-gray-800 text-[14px] flex gap-[10px] items-center justify-end p-[10px]">
+                            <p
+                                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                                className="cursor-pointer flex items-center justify-center h-[30px] w-[30px] rounded-full bg-gray-200"
+                            >
+                                <PiLessThanThin />
+                            </p>
+                            {Array.from({ length: totalPages }, (_, i) => (
+                                <p
+                                    key={i}
+                                    onClick={() => setCurrentPage(i + 1)}
+                                    className={`cursor-pointer flex items-center justify-center h-[30px] w-[30px] rounded-full ${
+                                        currentPage === i + 1 ? 'bg-orange-400 text-white' : 'bg-gray-200'
+                                    }`}
                                 >
-                                    <PiLessThanThin />
-                                </button>
-                                {Array.from({ length: totalPages }, (_, i) => (
-                                    <button
-                                        key={i}
-                                        onClick={() => setCurrentPage(i + 1)}
-                                        className={`h-8 w-8 flex items-center justify-center rounded-full ${currentPage === i + 1 ? 'bg-orange-400 text-white' : 'bg-gray-200'}`}
-                                    >
-                                        {i + 1}
-                                    </button>
-                                ))}
-                                <button
-                                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                                    className="h-8 w-8 flex items-center justify-center rounded-full bg-gray-200"
-                                >
-                                    <PiGreaterThanThin />
-                                </button>
-                            </div>
+                                    {i + 1}
+                                </p>
+                            ))}
+                            <p
+                                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                                className="cursor-pointer flex items-center justify-center h-[30px] w-[30px] rounded-full bg-gray-200"
+                            >
+                                <PiGreaterThanThin />
+                            </p>
                         </div>
                     </div>
                 </div>

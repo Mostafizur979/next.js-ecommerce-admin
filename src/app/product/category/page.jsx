@@ -19,12 +19,20 @@ export default function Category() {
     const [filteredProduct, setFilteredProduct] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [isCategory, setIscategory] = useState(false);
+    const [totalPages, setTotalPages] = useState(0);
+    const [startIndex, setStartIndex] = useState(0);
+    const [paginatedData, setPaginatedData] = useState([]);
     const [inputCategory, setInputCategory] = useState('');
-    const itemsPerPage = 5;
+    const [numOfRows, setNumOfRows] = useState("5");
+    let itemsPerPage = parseInt(numOfRows);
+    const handleChange = (event) => {
+        setNumOfRows(event.target.value)
+        setCurrentPage(1);
+    }
 
     const fetchCategories = async () => {
-         const data = await getCategories();
-         setProductCategory(data); 
+        const data = await getCategories();
+        setProductCategory(data);
     };
 
 
@@ -53,9 +61,16 @@ export default function Category() {
     }, [searchData, categoryFilter, productCategory]);
 
     // Pagination
-    const totalPages = Math.ceil(filteredProduct.length / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const paginatedData = filteredProduct.slice(startIndex, startIndex + itemsPerPage);
+    useEffect(() => {
+        const itemsPerPage = parseInt(numOfRows);
+        const total = Math.ceil(filteredProduct.length / itemsPerPage);
+        const start = (currentPage - 1) * itemsPerPage;
+        const paginated = filteredProduct.slice(start, start + itemsPerPage);
+        setTotalPages(total);
+        setStartIndex(start);
+        setPaginatedData(paginated);
+    }, [filteredProduct, currentPage, numOfRows]);
+
 
     const toggleSidebar = (val) => setIsSidebarOpen(val === "open");
 
@@ -167,28 +182,41 @@ export default function Category() {
                         </div>
 
                         {/* Pagination */}
-                        <div className="text-gray-800 text-sm flex gap-2 items-center justify-end p-4">
-                            <button
-                                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                                className="h-8 w-8 flex items-center justify-center rounded-full bg-gray-200"
-                            >
-                                <PiLessThanThin />
-                            </button>
-                            {Array.from({ length: totalPages }, (_, i) => (
+                        <div className="flex justify-between items-center">
+                            <div className="flex gap-2 ml-4 text-[14px]">
+                                <p>Item Per Page</p>
+                                <div>
+                                    <select value={numOfRows} onChange={handleChange} className="border-[1px] border-gray-400 rounded-[5px] outline-0">
+                                        <option vlaue="1">1</option>
+                                        <option vlaue="5">5</option>
+                                        <option value="10">10</option>
+                                        <option value="25">25</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="text-gray-800 text-sm flex gap-2 items-center justify-end p-4">
                                 <button
-                                    key={i}
-                                    onClick={() => setCurrentPage(i + 1)}
-                                    className={`h-8 w-8 flex items-center justify-center rounded-full ${currentPage === i + 1 ? 'bg-orange-400 text-white' : 'bg-gray-200'}`}
+                                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                                    className="h-8 w-8 flex items-center justify-center rounded-full bg-gray-200"
                                 >
-                                    {i + 1}
+                                    <PiLessThanThin />
                                 </button>
-                            ))}
-                            <button
-                                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                                className="h-8 w-8 flex items-center justify-center rounded-full bg-gray-200"
-                            >
-                                <PiGreaterThanThin />
-                            </button>
+                                {Array.from({ length: totalPages }, (_, i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => setCurrentPage(i + 1)}
+                                        className={`h-8 w-8 flex items-center justify-center rounded-full ${currentPage === i + 1 ? 'bg-orange-400 text-white' : 'bg-gray-200'}`}
+                                    >
+                                        {i + 1}
+                                    </button>
+                                ))}
+                                <button
+                                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                                    className="h-8 w-8 flex items-center justify-center rounded-full bg-gray-200"
+                                >
+                                    <PiGreaterThanThin />
+                                </button>
+                            </div>
                         </div>
                     </div>
 
