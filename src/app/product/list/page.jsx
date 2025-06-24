@@ -1,20 +1,21 @@
 'use client'
-import SideBar from "../../../components/SideBar";
-import Footer from "../../../components/footer";
+import SideBar from "@/components/SideBar";
+import Footer from "@/components/footer";
 import { useState, useEffect } from 'react';
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
-import { imagePath } from "../../../assets";
+import { imagePath } from "@/assets";
 import Image from "next/image";
-import getCategories from "../../../lib/getCategories";
-import getProducts from "../../../lib/getProductList";
+import getCategories from "@/lib/getCategories";
+import getProducts from "@/lib/getProductList";
 import { PiLessThanThin, PiGreaterThanThin } from "react-icons/pi";
 import { FiPlusCircle } from "react-icons/fi";
-import ProductListTable from "../../../components/ProductListTable";
+import ProductListTable from "@/components/ProductListTable";
 import Link from "next/link";
+import { useSearchParams, useRouter, usePathname} from "next/navigation";
 export default function ProductList() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [searchData, setSearchData] = useState('');
-    const [category, setCategory] = useState('all');
+    const [category, setCategory] = useState();
     const [categories, setCategories] = useState([]);
     const [product, setProduct] = useState([]);
     const [filteredProduct, setFilteredProduct] = useState([]);
@@ -23,6 +24,16 @@ export default function ProductList() {
     const [paginatedData, setPaginatedData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [numOfRows, setNumOfRows] = useState("5");
+    const searchParams = useSearchParams();
+    const categoryFilter = searchParams.get("category");
+    useEffect(() => {
+        if (categoryFilter) {
+            setCategory(categoryFilter)
+        }
+        else{
+            setCategory('all')
+        }
+    },[])
     const handleChange = (event) => {
         setNumOfRows(event.target.value)
         setCurrentPage(1);
@@ -73,6 +84,22 @@ export default function ProductList() {
         setPaginatedData(paginated);
     }, [filteredProduct, currentPage, numOfRows]);
 
+const router = useRouter();
+const pathname = usePathname();
+    
+const handleCategoryChange = (e) => {
+  const selected = e.target.value;
+  const params = new URLSearchParams(window.location.search);
+  setCategory(e.target.value);
+  if (selected === 'all') {
+    params.delete('category');
+  } else {
+    params.set('category', selected);
+  }
+
+  router.push(`${pathname}?${params.toString()}`);
+};
+
     return (
         <div className="w-full flex gap-[20px] bg-[#F7F7F7]">
             <SideBar sidebarOpen={isSidebarOpen} />
@@ -117,7 +144,7 @@ export default function ProductList() {
                             </div>
                             <div className="flex justify-end">
                                 <select
-                                    onChange={(e) => setCategory(e.target.value)}
+                                    onChange={handleCategoryChange}
                                     className="bg-white p-[10px] text-[12px] rounded-[10px] border border-gray-300 outline-0"
                                 >
                                     <option value="all">All</option>

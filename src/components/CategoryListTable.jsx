@@ -11,19 +11,23 @@ export default function CategoryListTable({ data, index }) {
         <>
             <tr className="border-b-[1px] border-gray-300">
                 <td className="p-2 py-4 pl-6"> {index}</td>
-                <td className="p-2">{data.name}</td>
+                <td className="p-2 flex">{data.name}
+                    <Link href={{ pathname: "/product/list/", query: { category: data?.name } }}
+                        className='text-white w-[20px] flex justify-center item-center p-[2px] text-[11px] ml-1  bg-[#3EB780] rounded-[5px] '> {data?.count}
+                    </Link>
+                </td>
                 <td className="p-2">{data.createdOn}</td>
                 <td className="flex items-center gap-[5px] p-2">
                     <img src={imagePath.user} height={20} width={20} alt="user" />
                     John Doe
                 </td>
                 <td className='p-2'>
-                    <p className='text-white w-16 text-center bg-[#3EB780] rounded py-1 px-2'>Active</p>
+                    <p className='text-white w-16 text-center bg-[#3EB780] rounded py-1 px-2'>{data.status}</p>
                 </td>
                 <td className="p-2 w-[150px]">
                     <div className="flex gap-[10px]">
                         <Link
-                        href=""
+                            href={{ pathname: "/product/category/edit/", query: { title: data?.name } }}
                             className='p-[5px] border-[1px] border-gray-300 rounded duration-300 hover:bg-[#FE9F43] hover:text-white'><FaRegEdit /></Link>
                         <div onClick={() => {
                             Swal.fire({
