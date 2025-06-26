@@ -15,6 +15,8 @@ import ImageUploading from 'react-images-uploading';
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { MdOutlineCloudUpload } from "react-icons/md";
 import getCategories from '../../../lib/getCategories';
+import getSubCategories from '@/lib/getSubCategories';
+
 export default function ProductDetails() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [product, setProduct] = useState([]);
@@ -27,9 +29,12 @@ export default function ProductDetails() {
     const [images, setImages] = useState([]);
     const maxNumber = 5;
     const [productCategory, setProductCategory] = useState([]);
+    const [subCategories, setSubCategories] = useState([]);
     const fetchCategories = async () => {
         const data = await getCategories();
+        const SubCategories = await getSubCategories();
         setProductCategory(data)
+        setSubCategories(SubCategories);
     };
 
     useEffect(() => {
@@ -88,7 +93,7 @@ export default function ProductDetails() {
     const formSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch('http://127.0.0.1:8000/api/createproduct/', {
+            const res = await fetch("http://127.0.0.1:8000/api/products/", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -231,10 +236,9 @@ export default function ProductDetails() {
                                         className="w-[100%] text-[14px] text-gray-600 p-[8px] outline-0 border-[1px] border-gray-200 rounded-[5px]"
                                     >
                                         <option value="Select">Select</option>
-                                        <option value="Laptop">Laptop</option>
-                                        <option value="Monitor">Monitor</option>
-                                        <option value="Router">Router</option>
-                                        <option value="Mobile">Mobile</option>
+                                         {subCategories.map((data, index) => (
+                                            <option key={index} value={data.name}>{data.name}</option>
+                                        ))}
                                     </select>
                                 </div>
                                 <div>

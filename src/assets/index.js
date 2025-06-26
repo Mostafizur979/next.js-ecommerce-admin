@@ -21,10 +21,12 @@ export const imagePath = {
     topproduct: '/product-top.png',
     warning: '/lowwarning.png',
     topcategory: '/topcategory.png',
-    transaction: '/transfer.png'
+    transaction: '/transfer.png',
+    noImage: '/noimage.png',
 }
 
 export const sideBarIcon = {
+    smallLogo: '/small-logo.png',
     dashboard: '/dashboard.png',
     productmanage: '/product-manage.png',
     product: '/productlist.png',
@@ -34,6 +36,6 @@ export const sideBarIcon = {
     addcategory: '/add-category.png',
     addsubcategory: '/add-subcategory.png',
     greater: '/greater.png',
-    down: '/down.png'
-
+    down: '/down.png',
+    sales: '/sales-menu.png',
 }

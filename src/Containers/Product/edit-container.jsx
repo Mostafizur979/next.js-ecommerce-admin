@@ -17,6 +17,8 @@ import { MdOutlineCloudUpload } from "react-icons/md";
 import getCategories from '@/lib/getCategories';
 import { useSearchParams } from 'next/navigation';
 import getProductDetails from '@/lib/getProductDetails';
+import { ToastContainer, toast } from 'react-toastify';
+import { useRouter } from 'next/navigation';
 export default function ProductUpdate() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [product, setProduct] = useState([]);
@@ -31,6 +33,7 @@ export default function ProductUpdate() {
     const [productCategory, setProductCategory] = useState([]);
     const searchParams = useSearchParams();
     const id = searchParams.get("id");
+    const router = useRouter();
     const fetchCategories = async () => {
         const data = await getCategories();
         setProductCategory(data)
@@ -116,7 +119,7 @@ export default function ProductUpdate() {
     const formSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch('http://127.0.0.1:8000/api/getproducts/', {
+            const res = await fetch('http://127.0.0.1:8000/api/products/', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -140,16 +143,27 @@ export default function ProductUpdate() {
             const data = await res.json();
 
             if (data.status === 'success') {
+                toast.success("Product updated successfully", {
+                    autoClose: 1500 
+                });
                 setInputs({});
                 setDescription("");
                 setImages([]);
+                setTimeout(() => {
+                    router.push('/product/list');
+                }, 1600);
+
             } else {
-                alert(`Error: ${data.message}`);
+                toast(`Error: ${data.message}`, {
+                    autoClose: 1500
+                });
             }
 
         } catch (error) {
             console.error('Fetch error:', error);
-            alert('Failed to send data.');
+            toast("Something went wrong, please try again later",{
+                autoClose: 1500
+            });
         }
     }
 
@@ -457,6 +471,7 @@ export default function ProductUpdate() {
                 </div>
                 <Footer />
             </div>
+            <ToastContainer />
         </div>
     );
 }

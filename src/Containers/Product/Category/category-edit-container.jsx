@@ -6,31 +6,40 @@ import Image from "next/image";
 import { FiPlusCircle } from "react-icons/fi";
 import Link from "next/link";
 import { FaArrowLeftLong, FaChevronDown, FaStarOfLife } from "react-icons/fa6";
-import { FaEdit } from "react-icons/fa"; // Use FaEdit instead of FaRegEdit
+import { FaEdit } from "react-icons/fa";
 import SideBar from "@/components/SideBar";
 import Footer from '@/components/footer';
 import React from 'react';
+import { ToastContainer, toast } from 'react-toastify';
 import ImageUploading from 'react-images-uploading';
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { MdOutlineCloudUpload } from "react-icons/md";
 import { useSearchParams } from 'next/navigation';
 import getCategoriesDetails from '@/lib/getCategoryInfo';
-
-export default function CategoryUpdate() {
+import { useRouter } from 'next/navigation';
+export default function CategoryUpdate({ isSubCategory = false }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [inputs, setInputs] = useState({ name: '', status: '' });
     const [isProductInformationOpen, setIsProductInformationOpen] = useState(true);
     const [isProductImageOpen, setIsProductImageOpen] = useState(true);
     const [images, setImages] = useState([]);
-    const maxNumber = 5;
+    const maxNumber = 1;
     const searchParams = useSearchParams();
-    const title = searchParams.get("title");
-
+    const id = searchParams.get("id");
+    const router = useRouter();
+    const route = isSubCategory ? '/product/sub-category' : '/product/category';
     useEffect(() => {
         const fetchCategory = async () => {
             try {
-                const productData = await getCategoriesDetails(title);
+                let productData;
+                if (isSubCategory) {
+                    productData = await getCategoriesDetails(id, true);
+                }
+                else {
+                    productData = await getCategoriesDetails(id);
+                }
                 setInputs({
+                    id: productData[0]?.id || '',
                     name: productData[0]?.name || '',
                     status: productData[0]?.status || '',
                 });
@@ -43,7 +52,7 @@ export default function CategoryUpdate() {
         };
 
         fetchCategory();
-    }, [title]);
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -51,19 +60,24 @@ export default function CategoryUpdate() {
     };
 
     const onChange = (imageList) => {
+        setImages([]);
         setImages(imageList);
+        console.log("Images: ", images)
     };
 
     const formSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch('http://127.0.0.1:8000/api/category/', {
+            let api = isSubCategory ? 'http://127.0.0.1:8000/api/subcategory/' : 'http://127.0.0.1:8000/api/category/';
+           
+            const res = await fetch(api, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-API-KEY': 'mysecretkey123',
                 },
                 body: JSON.stringify({
+                    id: inputs.id,
                     title: inputs.name,
                     status: inputs.status,
                     images: images[0]?.data_url || '',
@@ -72,9 +86,14 @@ export default function CategoryUpdate() {
             const data = await res.json();
 
             if (data.status === 'success') {
-                alert('Category updated successfully!');
+                toast.success('Category updated successfully!', {
+                    autoClose: 1500
+                })
                 setInputs({ name: '', status: '' });
                 setImages([]);
+                setTimeout(() => {
+                    router.push(route);
+                }, 1600);
             } else {
                 alert(`Error: ${data.message}`);
             }
@@ -88,6 +107,18 @@ export default function CategoryUpdate() {
         setInputs({ name: '', status: '' });
         setImages([]);
     };
+
+    const isBase64 = (str) => {
+        return typeof str === 'string' &&
+            /^[A-Za-z0-9+/=\n\r]+$/.test(str) &&
+            str.length > 100; // avoid short non-base64 strings
+    };
+
+    const resolvedSrc =
+        images[0]?.data_url && isBase64(images[0].data_url)
+            ? `data:image/png;base64,${images[0].data_url}`
+            : images[0]?.data_url
+
 
     return (
         <div className="w-full flex gap-[20px] bg-[#F7F7F7]">
@@ -108,20 +139,20 @@ export default function CategoryUpdate() {
                     {/* Header */}
                     <div className="grid grid-cols-2 pb-[10px]">
                         <div>
-                            <h1 className="text-[18px] text-gray-800 font-semibold">Edit Category</h1>
-                            <p className="text-[14px] text-gray-600">Update category information</p>
+                            <h1 className="text-[18px] text-gray-800 font-semibold">{ isSubCategory ? "Edit sub Category" : "Edit Category"}</h1>
+                            <p className="text-[14px] text-gray-600">{ isSubCategory ? "Update sub category information" : "Update category information"}</p>
                         </div>
                         <div className="flex gap-[10px] justify-end">
-                            <Link href="/product/category">
+                            <Link href={route}>
                                 <div className="bg-[#FE9F43] flex items-center text-white text-[14px] gap-[5px] p-[10px] rounded-[5px]">
                                     <FiPlusCircle size={12} />
-                                    <p>Add Category</p>
+                                    <p>{isSubCategory ? "Add sub Category" : "Add Category"}</p>
                                 </div>
                             </Link>
-                            <Link href="/product/category">
+                            <Link href={route}>
                                 <div className="bg-[#051A2D] flex items-center text-white text-[14px] gap-[5px] p-[10px] rounded-[5px]">
                                     <FaArrowLeftLong size={12} />
-                                    <p>Back to Category</p>
+                                    <p>{isSubCategory ? "Back to sub Category" : "Back to Category"}</p>
                                 </div>
                             </Link>
                         </div>
@@ -203,7 +234,10 @@ export default function CategoryUpdate() {
 
                                             {imageList.map((image, index) => (
                                                 <div key={index} className="p-2">
-                                                    <img src={image.data_url} alt="" className='border border-gray-300 p-2 h-[100px] w-[100px]' />
+                                                    <img
+                                                        src={resolvedSrc}
+                                                        alt=""
+                                                        className='border border-gray-300 p-2 h-[100px] w-[100px]' />
                                                     <div className="flex justify-between mt-2 gap-2">
                                                         <button type="button" onClick={() => onImageUpdate(index)} className='text-[#FE9F43] border p-2 rounded hover:bg-[#FE9F43] hover:text-white'>
                                                             <FaEdit size={15} />
@@ -233,6 +267,7 @@ export default function CategoryUpdate() {
                 </div>
                 <Footer />
             </div>
+            <ToastContainer />
         </div>
     );
 }

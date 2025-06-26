@@ -9,8 +9,10 @@ import { PiLessThanThin, PiGreaterThanThin } from "react-icons/pi";
 import { FiPlusCircle } from "react-icons/fi";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { FaStarOfLife } from "react-icons/fa";
-import CategoryListTable from "../../../components/CategoryListTable";
-import getCategories from "../../../lib/getCategories";
+import SubCategoryListTable from "../../../components/SubCategoryListTable";
+import getSubCategories from "@/lib/getSubCategories";
+import getCategories from "@/lib/getCategories";
+
 export default function Category() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [searchData, setSearchData] = useState('');
@@ -23,6 +25,8 @@ export default function Category() {
     const [startIndex, setStartIndex] = useState(0);
     const [paginatedData, setPaginatedData] = useState([]);
     const [inputCategory, setInputCategory] = useState('');
+    const [parentCategory, setParentCategory] = useState('Select');
+    const [productParentCategory, setProductParentCategory] = useState([]);
     const [numOfRows, setNumOfRows] = useState("5");
     let itemsPerPage = parseInt(numOfRows);
     const handleChange = (event) => {
@@ -31,10 +35,11 @@ export default function Category() {
     }
 
     const fetchCategories = async () => {
-        const data = await getCategories();
+        const data = await getSubCategories();
+        const parentData = await getCategories();
         setProductCategory(data);
+        setProductParentCategory(parentData);
     };
-
 
     useEffect(() => {
         fetchCategories();
@@ -73,8 +78,8 @@ export default function Category() {
 
 
     const toggleSidebar = (val) => setIsSidebarOpen(val === "open");
-
     const handleCategory = (e) => setInputCategory(e.target.value);
+    const handleParentCategory = (e) => setParentCategory(e.target.value);
 
     const resetInput = () => {
         setInputCategory('');
@@ -90,13 +95,13 @@ export default function Category() {
         }
 
         try {
-            const res = await fetch('http://127.0.0.1:8000/api/category/', {
+            const res = await fetch('http://127.0.0.1:8000/api/subcategory/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-API-KEY': 'mysecretkey123',
                 },
-                body: JSON.stringify({ category: inputCategory }),
+                body: JSON.stringify({ category: inputCategory, parentCategory: parentCategory }),
             });
 
             const data = await res.json();
@@ -130,15 +135,15 @@ export default function Category() {
                 <div className="w-full p-[18px]">
                     <div className="flex justify-between items-center">
                         <div>
-                            <h1 className="text-[18px] text-gray-800 font-semibold">Category</h1>
-                            <p className="text-[14px] text-gray-600">Manage your categories</p>
+                            <h1 className="text-[18px] text-gray-800 font-semibold">Sub Category</h1>
+                            <p className="text-[14px] text-gray-600">Manage your sub categories</p>
                         </div>
                         <button
                             onClick={() => setIscategory(true)}
                             className="bg-[#FE9F43] flex items-center text-white text-[14px] gap-[5px] p-[10px] rounded-[5px]"
                         >
                             <FiPlusCircle size={14} />
-                            <span>Add Category</span>
+                            <span>Add Sub Category</span>
                         </button>
                     </div>
 
@@ -168,6 +173,7 @@ export default function Category() {
                                     <tr className="font-semibold text-gray-800 border-t border-b border-gray-300">
                                         <th className="p-3 pl-6">#</th>
                                         <th className="p-3">Category</th>
+                                        <th className="p-3">Parent Category</th>
                                         <th className="p-3">Created On</th>
                                         <th className="p-3">Created By</th>
                                         <th className="p-3">Status</th>
@@ -176,7 +182,7 @@ export default function Category() {
                                 </thead>
                                 <tbody>
                                     {paginatedData.map((data, index) => (
-                                        <CategoryListTable key={data.id || index} data={data} index={(currentPage - 1) * itemsPerPage + index + 1} />
+                                        <SubCategoryListTable key={data.id || index} data={data} index={(currentPage - 1) * itemsPerPage + index + 1} />
                                     ))}
                                 </tbody>
                             </table>
@@ -225,23 +231,38 @@ export default function Category() {
                     {isCategory && (
                         <div className="w-[90%] max-w-[500px] p-5 bg-white shadow-lg rounded border border-gray-300 fixed top-[20%] left-1/2 transform -translate-x-1/2 z-50">
                             <div className="flex justify-between border-b border-gray-300 py-2">
-                                <h2 className="text-lg font-semibold">Add Category</h2>
+                                <h2 className="text-lg font-semibold">Add Sub Category</h2>
                                 <IoIosCloseCircleOutline onClick={resetInput} size={24} className="text-red-500 cursor-pointer" />
                             </div>
                             <form onSubmit={categorySubmit} className="mt-4">
                                 <label className="block text-sm text-gray-700 mb-1">
+                                    Parent Category <FaStarOfLife size={8} className="inline text-red-500" />
+                                </label>
+                                <select
+                                    name="category"
+                                    value={parentCategory}
+                                    onChange={handleParentCategory}
+                                    className="w-[100%] text-[14px] text-gray-600 p-[8px] outline-0 border-[1px] border-gray-200 rounded-[5px]"
+                                >
+                                    <option value="Select">Select</option>
+                                    {productParentCategory.map((data, index) => (
+                                        <option key={index} value={data.name}>{data.name}</option>
+                                    ))}
+                                </select>
+                                <label className="block mt-4 text-sm text-gray-700 mb-1">
                                     Category <FaStarOfLife size={8} className="inline text-red-500" />
                                 </label>
                                 <input
                                     type="text"
                                     value={inputCategory}
                                     onChange={handleCategory}
-                                    className="w-full p-2 border rounded text-sm text-gray-700"
+                                    className="w-full p-2 border border-gray-300 rounded text-sm text-gray-700 outline-0"
                                     required
                                 />
                                 {inputCategory && inputCategory.length < 3 && (
                                     <span className="text-red-500 text-xs">Category should be at least 3 letters.</span>
                                 )}
+
                                 <div className="flex gap-3 justify-end mt-5">
                                     <button type="button" onClick={resetInput} className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-white hover:text-gray-700 border">
                                         Cancel

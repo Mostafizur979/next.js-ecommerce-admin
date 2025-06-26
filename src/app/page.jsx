@@ -23,6 +23,7 @@ import Footer from "../components/footer";
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
 export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [collapsed , setCollapsed] = useState(false); 
   const toggleSidebar = (val) => {
     if (val == "open") {
       setIsSidebarOpen(true);
@@ -32,14 +33,18 @@ export default function Home() {
     }
   };
 
+  const sideBarHandle = ()=>{
+    setCollapsed(!collapsed);
+  }
+
   return (
     <>
       <div className="w-full flex gap-[20px] bg-[#F7F7F7]">
 
-        <SideBar sidebarOpen={isSidebarOpen} />
+        <SideBar sidebarOpen={isSidebarOpen} sideBarHandle={sideBarHandle} />
 
         {/* Dashboard Body */}
-        <div className="w-full ml-[0px] md:ml-[252px]">
+        <div className={`${collapsed ? "w-full ml-[0px] md:ml-[57px]" : "w-full ml-[0px] md:ml-[252px]"} duration-300 ease-in-out`}>
           <div className="md:hidden bg-white my-0 px-4 shadow-sm grid grid-cols-2 items-center sticky top-0 bottom-2  z-40">
             <button onClick={() => {
               toggleSidebar("open");

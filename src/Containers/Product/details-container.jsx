@@ -113,7 +113,7 @@ export default function ProductDetails() {
                                 </table>
                             </div>
                             <div className="col-span-3 order-1 lg:col-span-1 lg:order-2 flex justify-center items-center border border-gray-300 mr-[10px] my-[10px]">
-                                <img src={`data:image/png;base64,${product[0] && product[0].Image }`} className="h-[300px] w-[300px] object-fit" alt="product" />
+                                <img src={product[0] && product[0].Image == "no-image"? imagePath.noImage : `data:image/png;base64,${product[0] && product[0].Image }`} className="h-[300px] w-[300px] object-fit" alt="product" />
                             </div>
                         </div>
                     </div>
