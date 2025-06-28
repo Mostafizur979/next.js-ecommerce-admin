@@ -7,8 +7,12 @@ import Footer from "@/components/footer";
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
 import getCategories from "@/lib/getCategories";
 import getProducts from "@/lib/getProductList";
-import { set } from "react-datepicker/dist/date_utils";
-export default function Home() {
+import CustomInput from "@/components/CustomInput";
+import { TbCurrencyTaka } from "react-icons/tb";
+import { GoPlusCircle } from "react-icons/go";
+import { FiMinusCircle,FiPlusCircle } from "react-icons/fi";
+import { RiDeleteBin6Line } from "react-icons/ri";
+export default function POS() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [categories, setCategories] = useState([]);
@@ -16,6 +20,9 @@ export default function Home() {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [searchData, setSearchData] = useState("");
   const [inputs, setInputs] = useState({});
+  const [cartItems, setCartItems] = useState([]);
+  const [cartItemQty, setCartItemQty] = useState({})
+  const [cartLen, setCartLen] = useState(0);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -67,6 +74,35 @@ export default function Home() {
     setInputs(values => ({ ...values, [name]: value }))
   }
 
+  const handleCart = (sku) => {
+    console.log("Product added to cart with SKU:", sku);
+    let status = false;
+    cartItems.forEach((product,index)=>{
+      if(product.SKU == sku){
+        status = true;
+      }
+    })
+    if(status){
+      console.log("Already product added into cart")
+    }
+    else{
+     products.map((product,index)=>{
+      if(product.SKU == sku){
+        setCartItems( prev=>([...prev,product]))
+        setCartItemQty(prev=>({...prev, sku : 1}))
+      }
+    })
+    }
+  }
+  useEffect(()=>{
+    setCartLen(cartItems.length)
+   
+  },[cartItems])
+
+  const increaseCartQty = ()=>{
+
+  }
+
   return (
     <>
       <div className="w-full flex gap-[20px] bg-[#F7F7F7]">
@@ -107,18 +143,23 @@ export default function Home() {
 
               <div className="bg-[#F9FAFB] w-full ml-[160px] pr-[5px]  h-[100vh] overflow-y-auto [scrollbar-width:thin] [scrollbar-color:#FE9F43_#FFE3CB]">
                 <div className="py-3 px-1 ">
-                  <input
+                  <CustomInput
+                    width="750"
                     type="search"
+                    label={false}
                     placeholder="Search Product"
                     value={searchData}
                     onChange={(e) => { setSearchData(e.target.value) }}
-                    className="p-[10px] w-[150px] lg:w-[300px] border border-gray-300 text-gray-500 text-[14px] rounded-[10px] outline-0"
+                    name="search"
                   />
                 </div>
+
                 <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 p-[4px]">
                   {
                     products.map((product) => (
-                      <div key={product.id} className="bg-white border p-5 border-gray-200 rounded-[10px] hover:border-green-600 duration-300 ease-in-out" >
+                      <div key={product.SKU}
+                      onClick={() =>{handleCart(product.SKU)}}
+                      className="bg-white border p-5 border-gray-200 rounded-[10px] hover:border-green-600 duration-300 ease-in-out" >
                         <div className="flex justify-center items-center mb-6">
                           <img src={product.Image == "no-image" ? imagePath.noImage : `data:image/png;base64,${product.Image}`} className="h-[150px] w-[150px] object-contain" alt="product" />
                         </div>
@@ -137,16 +178,62 @@ export default function Home() {
             <div className="py-[10px] p-[10px] border-l-[1px] border-gray-300 ">
               <p className="text-[18px] text-gray-600 font-semibold pb-[10px]">New Order</p>
               <div>
-                <p
-                  className="bg-white text-[14px] text-gray-500 duration-300 relative  left-[10px] inline p-2 rounded-[10px] top-[10px]">Customer Name</p>
-                <input
-                  type="text"
+                <CustomInput
+                  width="full"
+                  label="Customer Name"
                   name="customerName"
+                  type={"text"}
                   value={inputs.customerName || ""}
                   onChange={handleChange}
-                  className="p-[10px] w-full bg-white  border border-gray-300 text-gray-500 text-[14px] rounded-[10px] outline-0"
+                  placeholder={""}
+                />
+
+                <CustomInput
+                  width="full"
+                  label="Mobile"
+                  name="customerMobile"
+                  type={"text"}
+                  value={inputs.customerMobile || ""}
+                  onChange={handleChange}
+                  placeholder={""}
                 />
               </div>
+              <div>
+
+                <div className="flex justify-between items-center mt-4">
+                  <p className="text-[18px] text-gray-600 font-semibold pb-[10px]">Order Details</p>
+                  <div className="p-2 text-[10px] text-gray-500 border-1 border-gray-300 rounded-[5px]">Items: <span className="text-green-600">{cartLen}</span></div>
+                </div>
+
+                <div className="grid grid-cols-7 gap-6 mt-4 items-center">
+                  <div className="col-span-2 text-[14px] text-gray-500 font-semibold">Product</div>
+                  <div className="col-span-3 text-[14px] text-gray-500 font-semibold text-center">Qty</div>
+                  <div className="text-[14px] text-gray-500 font-semibold">Price</div>
+                  <div></div>
+
+                 {cartItems.map((product,index)=>(
+                   <>
+                  <div className="col-span-2">
+                    <p className="text-[14px] text-gray-600">{product.Pname}</p>
+                    <p className="flex items-center text-[14px] text-gray-400">Price: <TbCurrencyTaka  size={16}/>{product.Price}</p>
+                  </div>
+                  <div className="col-span-3 flex justify-between items-center bg-[#E6EAED] rounded-[5px] p-2"> 
+                      <FiMinusCircle size={16} />
+                        <div className="text-gray-600 text-[14px]"></div>
+                      <FiPlusCircle size={16} />
+                  </div>
+                  <div className="text-[14px] text-gray-500 font-semibold flex "><TbCurrencyTaka  size={16}/>800
+                   </div>
+                  <div><RiDeleteBin6Line  size={16}/></div>
+                   </>
+                 ))}
+
+
+                </div>
+
+
+              </div>
+
             </div>
           </div>
         </div>
