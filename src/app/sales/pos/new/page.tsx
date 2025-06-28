@@ -15,6 +15,7 @@ export default function Home() {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [searchData, setSearchData] = useState("");
+  const [inputs, setInputs] = useState({});
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -60,6 +61,12 @@ export default function Home() {
 
   }, [searchData])
 
+  const handleChange = (event) => {
+    const name = event.target.name;
+    const value = event.target.value;
+    setInputs(values => ({ ...values, [name]: value }))
+  }
+
   return (
     <>
       <div className="w-full flex gap-[20px] bg-[#F7F7F7]">
@@ -81,9 +88,9 @@ export default function Home() {
             </button>
             <Image src={imagePath.logo} alt="logo" width={235} height={48} />
           </div>
-          <div className="w-full  bg-[#F9FAFB] grid grid-cols-3">
+          <div className="w-full grid grid-cols-3">
             <div className="col-span-2 flex gap-3">
-              <div className="w-[150px] flex flex-col gap-3 justify-center items-center border-r-[1px] border-gray-300 h-[100vh] pt-[800px] overflow-y-auto [scrollbar-width:thin] [scrollbar-color:#FE9F43_#FFE3CB]">
+              <div className="m-1 w-[150px] fixed flex flex-col gap-3 justify-center items-center border-r-[1px] border-gray-300 h-[100vh] pt-[800px] overflow-y-auto [scrollbar-width:thin] [scrollbar-color:#FE9F43_#FFE3CB]">
                 {categories.map((category) => (
                   <div key={category.id} className="max-w-[100px] p-2 flex flex-col  justify-center items-center bg-white  border border-gray-300 rounded-[10px] text-gray-600 hover:text-[#FE9F43] 
                 hover:border-[#FE9F43]
@@ -98,7 +105,7 @@ export default function Home() {
                 ))}
               </div>
 
-              <div className="w-full">
+              <div className="bg-[#F9FAFB] w-full ml-[160px] pr-[5px]  h-[100vh] overflow-y-auto [scrollbar-width:thin] [scrollbar-color:#FE9F43_#FFE3CB]">
                 <div className="py-3 px-1 ">
                   <input
                     type="search"
@@ -108,12 +115,12 @@ export default function Home() {
                     className="p-[10px] w-[150px] lg:w-[300px] border border-gray-300 text-gray-500 text-[14px] rounded-[10px] outline-0"
                   />
                 </div>
-                <div className="grid grid-cols-4 gap-4 p-[4px]">
+                <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 p-[4px]">
                   {
                     products.map((product) => (
                       <div key={product.id} className="bg-white border p-5 border-gray-200 rounded-[10px] hover:border-green-600 duration-300 ease-in-out" >
                         <div className="flex justify-center items-center mb-6">
-                          <img src={product.Image == "no-image" ? imagePath.noImage : `data:image/png;base64,${product.Image}`} className="h-[150px] w-[150px] object-fit" alt="product" />
+                          <img src={product.Image == "no-image" ? imagePath.noImage : `data:image/png;base64,${product.Image}`} className="h-[150px] w-[150px] object-contain" alt="product" />
                         </div>
                         <p className="text-[14px] text-gray-500 ">{product.SubCategory}</p>
                         <p className="text-[14px] font-semibold text-gray-600 mt-2">{product.Pname}</p>
@@ -127,7 +134,20 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <div></div>
+            <div className="py-[10px] p-[10px] border-l-[1px] border-gray-300 ">
+              <p className="text-[18px] text-gray-600 font-semibold pb-[10px]">New Order</p>
+              <div>
+                <p
+                  className="bg-white text-[14px] text-gray-500 duration-300 relative  left-[10px] inline p-2 rounded-[10px] top-[10px]">Customer Name</p>
+                <input
+                  type="text"
+                  name="customerName"
+                  value={inputs.customerName || ""}
+                  onChange={handleChange}
+                  className="p-[10px] w-full bg-white  border border-gray-300 text-gray-500 text-[14px] rounded-[10px] outline-0"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -93,7 +93,7 @@ export default function SideBar({sidebarOpen, sideBarHandle = () => {}}) {
                             {collapsed ? '' : "Sales"}
                         </div>
                         <div className={collapsed ? "hidden" : "flex justify-end pr-[10px]"}>
-                            {isProductsOpen ? <FaChevronDown size={14} /> : <FaChevronRight size={14} />}
+                            {isSalesOpen ? <FaChevronDown size={14} /> : <FaChevronRight size={14} />}
                         </div>
                     </div>
 
