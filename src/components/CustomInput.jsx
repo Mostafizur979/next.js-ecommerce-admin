@@ -27,7 +27,7 @@ export default function CustomInput({ width="full", label, name, type = "text", 
         onBlur={() => setIsFocused(false)}
         placeholder={floatLabel ? "" : placeholder}
         autoComplete="off"
-        className="w-full p-3 border border-gray-300 rounded-[10px] text-sm text-gray-700 outline-none"
+        className="w-full p-3 border border-gray-300 rounded-[5px] text-sm text-gray-700 outline-none"
       />
     </div>
   );

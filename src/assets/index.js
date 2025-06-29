@@ -23,6 +23,7 @@ export const imagePath = {
     topcategory: '/topcategory.png',
     transaction: '/transfer.png',
     noImage: '/noimage.png',
+    bkashQR: '/bkash_qr.jpg'
 }
 
 export const sideBarIcon = {
