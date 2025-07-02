@@ -18,11 +18,13 @@ import { LuScanLine } from "react-icons/lu";
 import { RiCloseCircleLine } from "react-icons/ri";
 import { ToastContainer, toast } from 'react-toastify';
 import CustomSelect from "@/components/UI/CustomSelect"
+import getCustomer from "@/lib/getCustomer";
 export default function POS() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
+  const [customer, setCustomer] = useState([])
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [searchData, setSearchData] = useState("");
   const [inputs, setInputs] = useState({});
@@ -42,10 +44,11 @@ export default function POS() {
       try {
         const category = await getCategories();
         const productData = await getProducts();
-
+        const customerData = await getCustomer();
         setCategories(category);
         setProducts(productData);
         setFilteredProducts(productData);
+        setCustomer(customerData)
 
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -54,6 +57,7 @@ export default function POS() {
 
     fetchData();
   }, [])
+
 
 
   const toggleSidebar = (val) => {
@@ -82,10 +86,25 @@ export default function POS() {
 
   }, [searchData])
 
+  const findCustomer = (cPhone) => {
+    customer.map((data) => {
+      if (data.phone == cPhone) {
+        setInputs({
+          customerMobile: data.phone,
+          customerName: data.name,
+          customerUpazila: data.upazila,
+          customerDistrict: data.district
+        })
+      }
+    })
+  }
   const handleChange = (event) => {
     const name = event.target.name;
     const value = event.target.value;
     setInputs(values => ({ ...values, [name]: value }))
+    if (name == "customerMobile") {
+      findCustomer(value)
+    }
   }
 
   const handleCart = (sku) => {
@@ -119,6 +138,7 @@ export default function POS() {
     let qty = cartItemQty[sku] + 1
     setCartItemQty(prev => ({ ...prev, [sku]: qty }))
     cartItems.map((product, index) => {
+      console.log("Cart Qty: " + product.Qty)
       if (product.SKU == sku) {
         setSubTotal(subTotal + product.Price);
       }
@@ -169,58 +189,62 @@ export default function POS() {
     setDiscountValue(subTotal * discount / 100)
 
   }, [subTotal])
-  
-  async function handleSubmit(){
-         let pid = [];
-         let qty = [];
-         let size = 0;
-         cartItems.map((product)=>{
-            pid.push(product.SKU)
-            qty.push(product.Qty)
-         })
-         for(let sku in cartItemQty){
-            size = size + cartItemQty[sku]
-         }
-        console.log("Hi")
-        debugger
-          try {
-            const res = await fetch("http://127.0.0.1:8000/api/sales/", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                
-                body: JSON.stringify({
-                    pid: pid,
-                    qty: qty,
-                    size: size,
-                    price: subTotal,
-                    tax: taxValue,
-                    shipping: shippingCost,
-                    discount: discountValue,
-                    address: customerDelivery,
-                    cName: customerName,
-                    cMobile: customerMobile,
-                    cUpazila: customerUpazila,
-                    cDistrict: customerDistrict
-                }),
-            });
-            debugger
 
-            const data = await res.json();
+  async function handleSubmit() {
+    let pid = [];
+    let size = 0;
+    cartItems.map((product) => {
+      pid.push(product.SKU)
+    })
+    for (let sku in cartItemQty) {
+      size = size + cartItemQty[sku]
+    }
 
-            if (data.status === 'success') {
-                setInputs({});
-                setDescription("");
-                setImages([]);
-            } else {
-                alert(`Error: ${data?.message}`);
-            }
+    try {
+      const res = await fetch("http://127.0.0.1:8000/api/sales/", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
 
-        } catch (error) {
-            console.error('Fetch error:', error);
-            alert('Failed to send data.');
-        }
+        body: JSON.stringify({
+          pid: pid,
+          qty: cartItemQty,
+          size: size,
+          price: subTotal,
+          tax: taxValue,
+          shipping: shippingCost,
+          discount: discountValue,
+          address: inputs.customerDelivery,
+          cName: inputs.customerName,
+          cMobile: inputs.customerMobile,
+          cUpazila: inputs.customerUpazila,
+          cDistrict: inputs.customerDistrict
+        }),
+      });
+
+      const data = await res.json();
+      if (data.status === 'success') {
+        toast.success("Invoice Created  Successfully", {
+          autoClose: 1500
+        });
+        setInputs({});
+        setCartItems([]);
+        setCartItemQty({});
+        setTax(0);
+        setDiscount(0);
+        setShippingCost(0);
+        setSubTotal(0);
+        setTaxValue(0);
+        setDiscountValue(0);
+      } else {
+        alert(`Error: ${data?.message}`);
+      }
+
+    } catch (error) {
+      console.error('Fetch error:', error);
+      alert("Failed to submit");
+    }
   }
 
   return (
@@ -304,20 +328,21 @@ export default function POS() {
               <div>
                 <CustomInput
                   width="full"
-                  label="Customer Name"
-                  name="customerName"
-                  type="text"
-                  value={inputs.customerName || ""}
-                  onChange={handleChange}
-                  placeholder=""
-                />
-
-                <CustomInput
-                  width="full"
                   label="Mobile"
                   name="customerMobile"
                   type="text"
                   value={inputs.customerMobile || ""}
+                  onChange={handleChange}
+                  placeholder=""
+                />
+
+
+                <CustomInput
+                  width="full"
+                  label="Customer Name"
+                  name="customerName"
+                  type="text"
+                  value={inputs.customerName || ""}
                   onChange={handleChange}
                   placeholder=""
                 />
@@ -441,8 +466,8 @@ export default function POS() {
                   <GoCreditCard className="text-[20px]" />
                   <p className="text-[14px]">Debit Card</p>
                 </div>
-                <div className="flex gap-1 flex-col items-center justify-center text-gray-600 p-2 border-1 border-gray-300 rounded-[10px] hover:border-amber-600 hover:bg-[#FFF6EE] hover:text-amber-600" 
-                 onClick={()=>{setIsQr(true)}}
+                <div className="flex gap-1 flex-col items-center justify-center text-gray-600 p-2 border-1 border-gray-300 rounded-[10px] hover:border-amber-600 hover:bg-[#FFF6EE] hover:text-amber-600"
+                  onClick={() => { setIsQr(true) }}
                 >
                   <LuScanLine className="text-[20px]" />
                   <p className="text-[14px]" >Scan</p>
