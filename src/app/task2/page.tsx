@@ -1,7 +1,7 @@
 'use client'
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FamilyTree } from "@/components/task-component"
-export default function pAge() {
+export default function page() {
 
     const [searchData, setSearchData] = useState('');
     const [searchResult, setSearchResult] = useState(FamilyTree);
@@ -10,19 +10,22 @@ export default function pAge() {
 
     const handleChange = (e) => {
         setSearchData(e.target.value)
+    }
+
+    useEffect(() => {
         let parent = [];
         let child = [];
-        let root = FamilyTree.filter((data) => data.Name.toLowerCase().includes(e.target.value.toLowerCase().trim()) || data.Location.toLowerCase().includes(e.target.value.toLowerCase().trim()));
+        let root = FamilyTree.filter((data) => data.Name.toLowerCase().includes(searchData.toLowerCase().trim()) || data.Location.toLowerCase().includes(searchData.toLowerCase().trim()));
 
 
         FamilyTree.map((pData, index) => {
-            let parentdata = pData.Parents.filter((data) => data.Name.toLowerCase().includes(e.target.value.toLowerCase().trim()) || data.Location.toLowerCase().includes(e.target.value.toLowerCase().trim()));
+            let parentdata = pData.Parents.filter((data) => data.Name.toLowerCase().includes(searchData.toLowerCase().trim()) || data.Location.toLowerCase().includes(searchData.toLowerCase().trim()));
             if (parentdata.length != 0) {
                 parent = [...parent, ...parentdata]
             }
-  
+
             pData.Parents.map((child2) => {
-                let childData = child2.Children.filter((data) => data.Name.toLowerCase().includes(e.target.value.toLowerCase().trim()) || data.Location.toLowerCase().includes(e.target.value.toLowerCase().trim()));
+                let childData = child2.Children.filter((data) => data.Name.toLowerCase().includes(searchData.toLowerCase().trim()) || data.Location.toLowerCase().includes(searchData.toLowerCase().trim()));
                 if (childData.length != 0) {
                     child = [...child, ...childData]
                 }
@@ -32,8 +35,9 @@ export default function pAge() {
         setSearchResult(root)
         setParentResult(parent)
         setChildResult(child)
+    }, [searchData])
 
-    }
+
 
 
     return (
