@@ -28,6 +28,7 @@ export default function SalesList() {
     const [collapsed, setCollapsed] = useState(false);
     const [numOfRows, setNumOfRows] = useState("5");
     const [top, setTop] = useState(0);
+    const [isAction, setIsAction] = useState(false);
     let itemsPerPage = parseInt(numOfRows);
     const handleChange = (event) => {
         setNumOfRows(event.target.value)
@@ -78,7 +79,7 @@ export default function SalesList() {
     const paginatedData = filteredsales.slice(startIndex, startIndex + itemsPerPage);
 
     return (
-        <div className="w-full flex gap-[20px] bg-[#F7F7F7]">
+        <div className="w-full flex gap-[20px] bg-[#F7F7F7]" >
             <SideBar sidebarOpen={isSidebarOpen} sideBarHandle={sideBarHandle} />
             <div className={`${collapsed ? "w-full ml-[0px] md:ml-[57px]" : "w-full ml-[0px] md:ml-[252px]"} duration-300 ease-in-out`}>
                 {/* Mobile header */}
@@ -133,8 +134,8 @@ export default function SalesList() {
                         </div>
 
                         {/* Table */}
-                        <div className="overflow-x-scroll lg:overflow-hidden ">
-                            <table className="w-[800px] lg:w-full text-[14px]">
+                        <div className="overflow-x-scroll lg:overflow-hidden " >
+                            <table className="w-[800px] lg:w-full text-[14px]" >
                                 <thead>
                                     <tr className="font-semibold text-gray-800 border-t border-b border-gray-200">
                                         <td className="p-2 py-5 pl-6">#</td>
@@ -166,20 +167,36 @@ export default function SalesList() {
                                             <td className="p-2">{'Due'}</td>
                                             <td className="p-2">Admin</td>
                                             <td className="p-2 flex justify-center cursor-pointer"
-                                             onClick={()=>{setTop(index)}}
+                                                onClick={() => {
+                                                    if (index > paginatedData.length - 2) {
+                                                        setTop(index - 2);
+                                                    }
+                                                    else if (index > paginatedData.length - 3) {
+                                                        setTop(index - 1);
+                                                    }
+                                                    else {
+                                                        setTop(index)
+                                                    }
+                                                    setIsAction(true)
+
+                                                }}
                                             ><BsThreeDotsVertical /></td>
+
+                                            {
+                                                isAction &&
+                                                <div className={`absolute top-[${200 + 60 * top}px] right-[5%] bg-white p-4 rounded-[5px] shadow-lg`}>
+                                                    <div className="flex gap-2 py-1 items-center"><IoEyeOutline /> Sale Detail</div>
+                                                    <div className="flex gap-2 py-1 items-center"><LiaEdit /> Sale Edit</div>
+                                                    <div className="flex gap-2 py-1 items-center"><MdArrowOutward />Show Payment</div>
+                                                    <div className="flex gap-2 py-1 items-center"><BiPlusCircle />Create Payment</div>
+                                                    <div className="flex gap-2 py-1 items-center"><RiDeleteBin6Line />Create Payment</div>
+                                                </div>
+                                            }
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
 
-                            <div className={`absolute top-[${200+60*top}px] right-[5%] bg-white p-4 rounded-[5px] shadow-2xl`}>
-                                <div className="flex gap-2 py-1 items-center"><IoEyeOutline /> Sale Detail</div>
-                                <div className="flex gap-2 py-1 items-center"><LiaEdit /> Sale Edit</div>
-                                <div className="flex gap-2 py-1 items-center"><MdArrowOutward />Show Payment</div>
-                                <div className="flex gap-2 py-1 items-center"><BiPlusCircle />Create Payment</div>
-                                <div className="flex gap-2 py-1 items-center"><RiDeleteBin6Line />Create Payment</div>
-                            </div>
                         </div>
 
                         {/* Pagination */}
