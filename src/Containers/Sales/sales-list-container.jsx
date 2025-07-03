@@ -16,7 +16,9 @@ import { LiaEdit } from "react-icons/lia";
 import { MdArrowOutward } from "react-icons/md";
 import { BiPlusCircle } from "react-icons/bi";
 import { RiDeleteBin6Line } from "react-icons/ri";
-import CreatePaymentModal from "@/Modal/sales-create-payment-modal";
+import CreatePaymentModal from "@/Modal/sales/sales-create-payment-modal";
+import SalesPaymentListModal from "@/Modal/sales/sales-payment-list-modal";
+import SalesDetailsModal from "@/Modal/sales/sales-details-modal";
 import { ToastContainer, toast } from 'react-toastify';
 
 export default function SalesList() {
@@ -34,7 +36,9 @@ export default function SalesList() {
     const [isAction, setIsAction] = useState(false);
     const [selectedItems, setSelectedItems] = useState({});
     const [Index, setIndex] = useState(0);
-    const [isPayModal, setIsPayModal] = useState(false)
+    const [isPayModal, setIsPayModal] = useState(false);
+    const [isPayListModal, setIsPayListModal] = useState(false);
+    const [isSalesDetailsModal, setIsSalesDetialsModal] = useState(false);
     const [sync, setSync] = useState(false)
     let itemsPerPage = parseInt(numOfRows);
     const modalRef = useRef();
@@ -219,46 +223,58 @@ export default function SalesList() {
                                         ))}
                                     </tbody>
                                 </table> : <div className="flex justify-center py-[20px]"><div className="loader "></div> </div>}
-                            {isAction && (
-                                <div
-                                    ref={modalRef}
-                                    style={{ top: `${80 + 60 * top}px` }}
-                                    className="absolute right-[5%] bg-white p-4 rounded-[5px] shadow-lg"
-                                >
-                                    <div className="flex gap-2 py-1 items-center cursor-pointer"><IoEyeOutline /> Sale Detail</div>
-                                    <div className="flex gap-2 py-1 items-center cursor-pointer"><LiaEdit /> Sale Edit</div>
-                                    <div className="flex gap-2 py-1 items-center cursor-pointer"><MdArrowOutward /> Show Payment</div>
-                                    <div className="flex gap-2 py-1 items-center cursor-pointer"
-                                        onClick={() => {
-                                            console.log(paginatedData[Index]?.sid);
-                                            setIsPayModal(true)
-                                            setSelectedItems({
-                                                invId: paginatedData[Index]?.sid,
-                                                name: paginatedData[Index]?.cid
-                                            })
-                                        }}
-                                    ><BiPlusCircle /> Create Payment</div>
-                                    <div className="flex gap-2 py-1 items-center cursor-pointer"><RiDeleteBin6Line /> Delete Payment</div>
-                                </div>
-                            )}
-                            {isPayModal && (
-                                <div className="w-[600px] absolute right-[35%] top-[30%] bg-white p-4 rounded-[5px] shadow-lg animate-zoomIn">
-                                    <CreatePaymentModal
-                                        selected={selectedItems}
-                                        handle={() => setIsPayModal(false)}
-                                        callback={() => {
-                                            toast.success("Payment Successfully completed", {
-                                                autoClose: 1500
-                                            });
-                                            setSync(!sync)
-                                        }}
-                                    />
-                                </div>
-                            )}
-
-
                         </div>
+                        {isAction && (
+                            <div
+                                ref={modalRef}
+                                style={{ top: `${200 + 60 * top}px` }}
+                                className="absolute right-[5%] bg-white p-4 rounded-[5px] shadow-lg z-10"
+                            >
+                                <div className="flex gap-2 py-1 items-center cursor-pointer" onClick={()=>{setIsSalesDetialsModal(true)}}><IoEyeOutline /> Sale Detail</div>
+                                <div className="flex gap-2 py-1 items-center cursor-pointer"><LiaEdit /> Sale Edit</div>
+                                <div className="flex gap-2 py-1 items-center cursor-pointer"
+                                    onClick={() => { setIsPayListModal(true) }}
+                                ><MdArrowOutward /> Show Payment</div>
+                                <div className="flex gap-2 py-1 items-center cursor-pointer"
+                                    onClick={() => {
+                                        console.log(paginatedData[Index]?.sid);
+                                        setIsPayModal(true)
+                                        setSelectedItems({
+                                            invId: paginatedData[Index]?.sid,
+                                            name: paginatedData[Index]?.cid
+                                        })
+                                    }}
+                                ><BiPlusCircle /> Create Payment</div>
+                                <div className="flex gap-2 py-1 items-center cursor-pointer"><RiDeleteBin6Line /> Delete Sales</div>
+                            </div>
+                        )}
+                        {isPayModal && (
+                            <div className="w-[600px] z-10 absolute right-[35%] top-[20%] bg-white p-4 rounded-[5px] shadow-lg border-1 border-gray-300 animate-zoomIn">
+                                <CreatePaymentModal
+                                    selected={selectedItems}
+                                    handle={() => setIsPayModal(false)}
+                                    callback={() => {
+                                        toast.success("Payment Successfully completed", {
+                                            autoClose: 1500
+                                        });
+                                        setSync(!sync)
+                                    }}
+                                />
+                            </div>
+                        )}
 
+                        {isPayListModal && (
+                            <div className="w-[600px] z-10 absolute right-[35%] top-[20%] bg-white p-4 rounded-[5px] shadow-lg border-1 border-gray-300 animate-zoomIn">
+                                <SalesPaymentListModal sid={paginatedData[Index]?.sid} handlePaymentList={() => {
+                                    setIsPayListModal(false)
+                                }} />
+                            </div>
+                        )}
+                        {isSalesDetailsModal && (
+                            <div className="w-[80%] z-10 absolute right-[3%] top-[8%] bg-white p-4 rounded-[5px] shadow-lg border-1 border-gray-300 animate-zoomIn">
+                                <SalesDetailsModal sid={paginatedData[Index]?.sid} callback={()=>{setIsSalesDetialsModal(false)}}/>
+                            </div>
+                        )}
                         {/* Pagination */}
                         <div className="flex justify-between items-center">
                             <div className="flex gap-2 ml-4 text-[14px]">

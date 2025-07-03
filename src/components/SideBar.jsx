@@ -47,7 +47,7 @@ export default function SideBar({sidebarOpen, sideBarHandle = () => {}}) {
                 <div className={`${collapsed ? "hidden" : "flex gap-[5px] p-4 border-b-[1px] border-gray-300"}`}>
                     <Image src={imagePath.user} alt="user" height={50} width={50} className="rounded-[50%]" />
                     <div className="text-[14px] text-gray-800">
-                        <p>John Doe</p>
+                        <p>Mostafizur Rahman</p>
                         <p>Super Admin</p>
                     </div>
                 </div>
