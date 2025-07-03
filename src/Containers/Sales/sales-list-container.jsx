@@ -1,7 +1,7 @@
 'use client'
 import SideBar from "@/components/SideBar";
 import Footer from "@/components/footer";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
 import { imagePath } from "@/assets";
 import Image from "next/image";
@@ -16,12 +16,15 @@ import { LiaEdit } from "react-icons/lia";
 import { MdArrowOutward } from "react-icons/md";
 import { BiPlusCircle } from "react-icons/bi";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import CreatePaymentModal from "@/Modal/sales-create-payment-modal";
+import { ToastContainer, toast } from 'react-toastify';
 
 export default function SalesList() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [searchData, setSearchData] = useState('');
     const [category, setCategory] = useState('all');
     const [categories, setCategories] = useState([]);
+    const [paymentStatus, setPaymentStatus] = useState('all');
     const [sales, setsales] = useState([]);
     const [filteredsales, setFilteredsales] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -29,24 +32,44 @@ export default function SalesList() {
     const [numOfRows, setNumOfRows] = useState("5");
     const [top, setTop] = useState(0);
     const [isAction, setIsAction] = useState(false);
+    const [selectedItems, setSelectedItems] = useState({});
+    const [Index, setIndex] = useState(0);
+    const [isPayModal, setIsPayModal] = useState(false)
+    const [sync, setSync] = useState(false)
     let itemsPerPage = parseInt(numOfRows);
+    const modalRef = useRef();
+    const iconRef = useRef();
+
+    const handleClickOutside = (event) => {
+        if (
+            modalRef.current &&
+            !modalRef.current.contains(event.target) &&
+            iconRef.current &&
+            !iconRef.current.contains(event.target)
+        ) {
+            setIsAction(false);
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
     const handleChange = (event) => {
         setNumOfRows(event.target.value)
         setCurrentPage(1);
     }
-
-
     useEffect(() => {
         async function fetchData() {
             const data = await getCategories();
             const salesData = await getSales();
-            console.log("data ", salesData);
             setsales(salesData);
             setCategories(data);
-            setFilteredsales(salesData); // Initial value
+            setFilteredsales(salesData);
         }
         fetchData();
-    }, []);
+    }, [sync]);
 
     const toggleSidebar = (val) => {
         setIsSidebarOpen(val === "open");
@@ -64,15 +87,19 @@ export default function SalesList() {
             );
         }
 
-        if (category !== "all") {
-            result = result.filter((prod) =>
-                prod.Category.toLowerCase() === category.toLowerCase()
+        if (paymentStatus === "Paid") {
+            result = result.filter(
+                (sales) => sales.subTotal <= sales.paid + sales.discount
+            );
+        } else if (paymentStatus === "Due") {
+            result = result.filter(
+                (sales) => sales.subTotal > sales.paid + sales.discount
             );
         }
 
         setFilteredsales(result);
         setCurrentPage(1); // Reset page on filter
-    }, [searchData, category, sales]);
+    }, [searchData, paymentStatus, sales]);
 
     const totalPages = Math.ceil(filteredsales.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -122,80 +149,113 @@ export default function SalesList() {
                             </div>
                             <div className="flex justify-end">
                                 <select
-                                    onChange={(e) => setCategory(e.target.value)}
+                                    onChange={(e) => setPaymentStatus(e.target.value)}
                                     className="bg-white p-[10px] text-[12px] rounded-[10px] border border-gray-300 outline-0"
                                 >
                                     <option value="all">All</option>
-                                    {categories.map((cat, index) => (
-                                        <option key={index} value={cat.name}>{cat.name}</option>
-                                    ))}
+                                    <option value="Paid">Paid</option>
+                                    <option value="Due">Due</option>
+
                                 </select>
                             </div>
                         </div>
 
                         {/* Table */}
-                        <div className="overflow-x-scroll lg:overflow-hidden " >
-                            <table className="w-[800px] lg:w-full text-[14px]" >
-                                <thead>
-                                    <tr className="font-semibold text-gray-800 border-t border-b border-gray-200">
-                                        <td className="p-2 py-5 pl-6">#</td>
-                                        <td className="p-2">Invoice No.</td>
-                                        <td className="p-2">Customer Name</td>
-                                        <td className="p-2">Date & Time</td>
-                                        <td className="p-2">Status</td>
-                                        <td className="p-2">Grand Total</td>
-                                        <td className="p-2">Paid</td>
-                                        <td className="p-2">Due</td>
-                                        <td className="p-2">Discount</td>
-                                        <td className="p-2">payment Status</td>
-                                        <td className="p-2">Added By</td>
-                                        <td className="p-2">Action</td>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {paginatedData.map((data, index) => (
-                                        <tr className="border-b-[1px] border-gray-200">
-                                            <td className="p-2 py-5 pl-6">{index + 1}</td>
-                                            <td className="p-2">{data.sid}</td>
-                                            <td className="p-2">{data.cid}</td>
-                                            <td className="p-2">{data.invoicedate}</td>
-                                            <td ><span className="bg-[#06AED4] p-2 text-white rounded-[5px]">Pending</span></td>
-                                            <td className="p-2">{data.subTotal}</td>
-                                            <td className="p-2">{data.subTotal - 500}</td>
-                                            <td className="p-2">500</td>
-                                            <td className="p-2">{data.discount}</td>
-                                            <td className="p-2">{'Due'}</td>
-                                            <td className="p-2">Admin</td>
-                                            <td className="p-2 flex justify-center cursor-pointer"
-                                                onClick={() => {
-                                                    if (index > paginatedData.length - 2) {
-                                                        setTop(index - 2);
-                                                    }
-                                                    else if (index > paginatedData.length - 3) {
-                                                        setTop(index - 1);
-                                                    }
-                                                    else {
-                                                        setTop(index)
-                                                    }
-                                                    setIsAction(true)
-
-                                                }}
-                                            ><BsThreeDotsVertical /></td>
-
-                                            {
-                                                isAction &&
-                                                <div className={`absolute top-[${200 + 60 * top}px] right-[5%] bg-white p-4 rounded-[5px] shadow-lg`}>
-                                                    <div className="flex gap-2 py-1 items-center"><IoEyeOutline /> Sale Detail</div>
-                                                    <div className="flex gap-2 py-1 items-center"><LiaEdit /> Sale Edit</div>
-                                                    <div className="flex gap-2 py-1 items-center"><MdArrowOutward />Show Payment</div>
-                                                    <div className="flex gap-2 py-1 items-center"><BiPlusCircle />Create Payment</div>
-                                                    <div className="flex gap-2 py-1 items-center"><RiDeleteBin6Line />Create Payment</div>
-                                                </div>
-                                            }
+                        <div className="overflow-x-scroll lg:overflow-hidden relative overflow-y-auto" >
+                            {sales[0]?.sid ?
+                                <table className="w-[800px] lg:w-full text-[14px] " >
+                                    <thead>
+                                        <tr className="font-semibold text-gray-800 border-t border-b border-gray-200 sticky top-[0px] bg-white z-10 ">
+                                            <td className="p-2 py-5 pl-6">#</td>
+                                            <td className="p-2">Invoice No.</td>
+                                            <td className="p-2">Customer Name</td>
+                                            <td className="p-2">Date & Time</td>
+                                            <td className="p-2">Status</td>
+                                            <td className="p-2">Grand Total</td>
+                                            <td className="p-2">Paid</td>
+                                            <td className="p-2">Due</td>
+                                            <td className="p-2">Discount</td>
+                                            <td className="p-2 text-center">payment Status</td>
+                                            <td className="p-2">Added By</td>
+                                            <td className="p-2">Action</td>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+
+                                    <tbody>
+                                        {paginatedData.map((data, index) => (
+                                            <tr className="border-b-[1px] border-gray-200" key={index}>
+                                                <td className="p-2 py-5 pl-6">{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                                                <td className="p-2">{data.sid}</td>
+                                                <td className="p-2">{data.cid}</td>
+                                                <td className="p-2">{data.invoicedate}</td>
+                                                <td ><span className={` ${data.status == "Pending" ? 'bg-[#06AED4]' : "bg-green-700"} p-2 text-white rounded-[5px]`}>{data.status}</span></td>
+                                                <td className="p-2">{data.subTotal}</td>
+                                                <td className="p-2">{data.paid}</td>
+                                                <td className="p-2">{data.subTotal - data.paid - data.discount}</td>
+                                                <td className="p-2">{data.discount}</td>
+                                                <td className="text-center">
+                                                    {data.subTotal <= data.paid + data.discount ? <span className="p-2 text-white bg-green-600 rounded-[5px]">paid</span> : <span className="p-2 text-white bg-red-400 rounded-[5px]">Due</span>}
+                                                </td>
+                                                <td className="p-2">Admin</td>
+                                                <td className="p-2 px-6 cursor-pointer"
+                                                    ref={iconRef}
+                                                    onClick={() => {
+                                                        setIndex(index)
+                                                        if (index > paginatedData.length - 2) {
+                                                            setTop(index - 2);
+                                                        }
+                                                        else if (index > paginatedData.length - 3) {
+                                                            setTop(index - 1);
+                                                        }
+                                                        else {
+                                                            setTop(index)
+                                                        }
+                                                        setIsAction(true)
+
+                                                    }}
+                                                ><BsThreeDotsVertical size={16} /></td>
+
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table> : <div className="flex justify-center py-[20px]"><div className="loader "></div> </div>}
+                            {isAction && (
+                                <div
+                                    ref={modalRef}
+                                    style={{ top: `${80 + 60 * top}px` }}
+                                    className="absolute right-[5%] bg-white p-4 rounded-[5px] shadow-lg"
+                                >
+                                    <div className="flex gap-2 py-1 items-center cursor-pointer"><IoEyeOutline /> Sale Detail</div>
+                                    <div className="flex gap-2 py-1 items-center cursor-pointer"><LiaEdit /> Sale Edit</div>
+                                    <div className="flex gap-2 py-1 items-center cursor-pointer"><MdArrowOutward /> Show Payment</div>
+                                    <div className="flex gap-2 py-1 items-center cursor-pointer"
+                                        onClick={() => {
+                                            console.log(paginatedData[Index]?.sid);
+                                            setIsPayModal(true)
+                                            setSelectedItems({
+                                                invId: paginatedData[Index]?.sid,
+                                                name: paginatedData[Index]?.cid
+                                            })
+                                        }}
+                                    ><BiPlusCircle /> Create Payment</div>
+                                    <div className="flex gap-2 py-1 items-center cursor-pointer"><RiDeleteBin6Line /> Delete Payment</div>
+                                </div>
+                            )}
+                            {isPayModal && (
+                                <div className="w-[600px] absolute right-[35%] top-[30%] bg-white p-4 rounded-[5px] shadow-lg animate-zoomIn">
+                                    <CreatePaymentModal
+                                        selected={selectedItems}
+                                        handle={() => setIsPayModal(false)}
+                                        callback={() => {
+                                            toast.success("Payment Successfully completed", {
+                                                autoClose: 1500
+                                            });
+                                            setSync(!sync)
+                                        }}
+                                    />
+                                </div>
+                            )}
+
 
                         </div>
 
@@ -238,6 +298,7 @@ export default function SalesList() {
                         </div>
                     </div>
                 </div>
+                <ToastContainer />
                 <Footer />
             </div>
         </div>

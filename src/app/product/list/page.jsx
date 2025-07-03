@@ -11,7 +11,7 @@ import { PiLessThanThin, PiGreaterThanThin } from "react-icons/pi";
 import { FiPlusCircle } from "react-icons/fi";
 import ProductListTable from "@/components/ProductListTable";
 import Link from "next/link";
-import { useSearchParams, useRouter, usePathname} from "next/navigation";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import customLoader from "@/components/UI/CustomLoader";
 export default function ProductList() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -31,10 +31,10 @@ export default function ProductList() {
         if (categoryFilter) {
             setCategory(categoryFilter)
         }
-        else{
+        else {
             setCategory('all')
         }
-    },[])
+    }, [])
     const handleChange = (event) => {
         setNumOfRows(event.target.value)
         setCurrentPage(1);
@@ -84,23 +84,23 @@ export default function ProductList() {
         setPaginatedData(paginated);
     }, [filteredProduct, currentPage, numOfRows]);
 
-const router = useRouter();
-const pathname = usePathname();
-const handleCategoryChange = (e) => {
-  const selected = e.target.value;
-  const params = new URLSearchParams(window.location.search);
-  setCategory(e.target.value);
-  if (selected === 'all') {
-    params.delete('category');
-  } else {
-    params.set('category', selected);
-  }
+    const router = useRouter();
+    const pathname = usePathname();
+    const handleCategoryChange = (e) => {
+        const selected = e.target.value;
+        const params = new URLSearchParams(window.location.search);
+        setCategory(e.target.value);
+        if (selected === 'all') {
+            params.delete('category');
+        } else {
+            params.set('category', selected);
+        }
 
-  router.push(`${pathname}?${params.toString()}`);
-};
+        router.push(`${pathname}?${params.toString()}`);
+    };
 
     return (
-         <div className="w-full flex gap-[20px] bg-[#F7F7F7]">
+        <div className="w-full flex gap-[20px] bg-[#F7F7F7]">
             <SideBar sidebarOpen={isSidebarOpen} />
             <div className="w-full bg-[#F7F7F7] ml-[0px] md:ml-[252px]">
                 {/* Mobile header */}
@@ -155,38 +155,38 @@ const handleCategoryChange = (e) => {
                         </div>
 
                         {/* Table */}
-                        { product[0]?.Pname ? 
-                        
-                                                  <div className="overflow-x-scroll lg:overflow-hidden">
-                            <table className="w-[800px] lg:w-full text-[14px]">
-                                <thead>
-                                    <tr className="font-semibold text-gray-800 border-t border-b border-gray-300">
-                                        <td className="p-2 pl-6">#</td>
-                                        <td className="p-2">SKU</td>
-                                        <td className="p-2">Product Name</td>
-                                        <td className="p-2">Category</td>
-                                        <td className="p-2">Price</td>
-                                        <td className="p-2">Unit</td>
-                                        <td className="p-2">Qty</td>
-                                        <td className="p-2">Created By</td>
-                                        <td className="p-2">Action</td>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {paginatedData.map((data, index) => (
-                                        <ProductListTable
-                                            key={index}
-                                            data={data}
-                                            index={startIndex + index}
-                                        />
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                        : <div className="flex justify-center py-[20px]"><div className="loader "></div> </div>
+                        {product[0]?.Pname ?
 
-                           
-                    }
+                            <div className="overflow-x-scroll lg:overflow-hidden">
+                                <table className="w-[800px] lg:w-full text-[14px]">
+                                    <thead>
+                                        <tr className="font-semibold text-gray-800 border-t border-b border-gray-300">
+                                            <td className="p-2 pl-6">#</td>
+                                            <td className="p-2">SKU</td>
+                                            <td className="p-2">Product Name</td>
+                                            <td className="p-2">Category</td>
+                                            <td className="p-2">Price</td>
+                                            <td className="p-2">Unit</td>
+                                            <td className="p-2">Qty</td>
+                                            <td className="p-2">Created By</td>
+                                            <td className="p-2">Action</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {paginatedData.map((data, index) => (
+                                            <ProductListTable
+                                                key={index}
+                                                data={data}
+                                                index={startIndex + index}
+                                            />
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                            : <div className="flex justify-center py-[20px]"><div className="loader "></div> </div>
+
+
+                        }
 
                         {/* Pagination */}
                         <div className="flex justify-between items-center">
