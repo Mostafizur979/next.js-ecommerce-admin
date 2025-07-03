@@ -2,16 +2,22 @@ import { useEffect, useState } from "react";
 import { LuPrinter } from "react-icons/lu";
 import getSales from "@/lib/getSales";
 export default function SalesDetailsModal({ sid, callback }) {
-    const [sales, setSales] = useState([])
+    const [sales, setSales] = useState([]);
+    const [products, setProducts] = useState([]);
     useEffect(() => {
         async function getSalesData() {
             let salesData = await getSales();
             salesData = salesData.filter((data) => data.sid == sid)
-            setSales(salesData)
+            let productsId = salesData[0].pid.split(",");
+            let productsQty = salesData[0].qty.split(",");
+            setProducts([])
+            productsId.map((product, index) => {
+                setProducts(prev => ([...prev, { pid: product, qty: productsQty[index] }]))
+            })
+
         }
         getSalesData()
     }, [])
-    console.log("Sales: "+sales)
     return (
         <>
             <div>
@@ -72,11 +78,17 @@ export default function SalesDetailsModal({ sid, callback }) {
                             </thead>
 
                             <tbody>
-                                <td className="p-2">{sales[0]?.pid}</td>
-                                <td className="p-2">{sales[0]?.subTotal}</td>
-                                <td className="p-2">{sales[0]?.qty}</td>
-                                <td className="p-2">{sales[0]?.discount}</td>
-                                 <td className="p-2">{sales[0]?.subTotal}</td>
+                                {
+                                    products.map((data) => (
+                                        <tr>
+                                            <td className="p-2">{data.pid}</td>
+                                            <td className="p-2"></td>
+                                            <td className="p-2">{data.qty}</td>
+                                            <td className="p-2"></td>
+                                            <td className="p-2"></td>
+                                        </tr>
+                                    ))
+                                }
                             </tbody>
                         </table>
                     </div>
