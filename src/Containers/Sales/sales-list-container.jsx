@@ -93,11 +93,11 @@ export default function SalesList() {
 
         if (paymentStatus === "Paid") {
             result = result.filter(
-                (sales) => sales.subTotal <= sales.paid + sales.discount
+                (sales) => sales.subTotal + sales.tax <= sales.paid + sales.discount
             );
         } else if (paymentStatus === "Due") {
             result = result.filter(
-                (sales) => sales.subTotal > sales.paid + sales.discount
+                (sales) => sales.subTotal + sales.tax > sales.paid + sales.discount
             );
         }
 
@@ -131,7 +131,7 @@ export default function SalesList() {
                             <p className="text-[14px] text-gray-600">Manage your sales</p>
                         </div>
                         <div className="flex justify-end">
-                            <Link href="/sales/new">
+                            <Link href="/sales/pos/new">
                                 <div className="bg-[#FE9F43] flex items-center text-white text-[14px] gap-[5px] p-[10px] rounded-[5px]">
                                     <FiPlusCircle size={12} />
                                     <p>Add sales</p>
@@ -175,10 +175,12 @@ export default function SalesList() {
                                             <td className="p-2">Customer Name</td>
                                             <td className="p-2">Date & Time</td>
                                             <td className="p-2">Status</td>
+                                            <td className="p-2">Product Price</td>
+                                            <td className="p-2">Discount</td>
+                                            <td className="p-2">Tax</td>
                                             <td className="p-2">Grand Total</td>
                                             <td className="p-2">Paid</td>
                                             <td className="p-2">Due</td>
-                                            <td className="p-2">Discount</td>
                                             <td className="p-2 text-center">payment Status</td>
                                             <td className="p-2">Added By</td>
                                             <td className="p-2">Action</td>
@@ -194,11 +196,13 @@ export default function SalesList() {
                                                 <td className="p-2">{data.invoicedate}</td>
                                                 <td ><span className={` ${data.status == "Pending" ? 'bg-[#06AED4]' : "bg-green-700"} p-2 text-white rounded-[5px]`}>{data.status}</span></td>
                                                 <td className="p-2">{data.subTotal}</td>
-                                                <td className="p-2">{data.paid}</td>
-                                                <td className="p-2">{data.subTotal - data.paid - data.discount}</td>
                                                 <td className="p-2">{data.discount}</td>
+                                                <td className="p-2">{data.tax}</td>
+                                                <td className="p-2">{data.subTotal + data.tax - data.discount}</td>
+                                                <td className="p-2 text-green-600">{data.paid}</td>
+                                                <td className="p-2 text-red-600">{data.subTotal + data.tax - data.paid - data.discount}</td>
                                                 <td className="text-center">
-                                                    {data.subTotal <= data.paid + data.discount ? <span className="p-2 text-white bg-green-600 rounded-[5px]">paid</span> : <span className="p-2 text-white bg-red-400 rounded-[5px]">Due</span>}
+                                                    {data.subTotal + data.tax <= data.paid + data.discount ? <span className="p-2 text-white bg-green-600 rounded-[5px]">paid</span> : <span className="p-2 text-white bg-red-400 rounded-[5px]">Due</span>}
                                                 </td>
                                                 <td className="p-2">Admin</td>
                                                 <td className="p-2 px-6 cursor-pointer"
@@ -230,7 +234,7 @@ export default function SalesList() {
                                 style={{ top: `${200 + 60 * top}px` }}
                                 className="absolute right-[5%] bg-white p-4 rounded-[5px] shadow-lg z-10"
                             >
-                                <div className="flex gap-2 py-1 items-center cursor-pointer" onClick={()=>{setIsSalesDetialsModal(true)}}><IoEyeOutline /> Sale Detail</div>
+                                <div className="flex gap-2 py-1 items-center cursor-pointer" onClick={() => { setIsSalesDetialsModal(true) }}><IoEyeOutline /> Sale Detail</div>
                                 <div className="flex gap-2 py-1 items-center cursor-pointer"><LiaEdit /> Sale Edit</div>
                                 <div className="flex gap-2 py-1 items-center cursor-pointer"
                                     onClick={() => { setIsPayListModal(true) }}
@@ -272,7 +276,7 @@ export default function SalesList() {
                         )}
                         {isSalesDetailsModal && (
                             <div className="w-[80%] z-10 absolute right-[3%] top-[8%] bg-white p-4 rounded-[5px] shadow-lg border-1 border-gray-300 animate-zoomIn">
-                                <SalesDetailsModal sid={paginatedData[Index]?.sid} callback={()=>{setIsSalesDetialsModal(false)}}/>
+                                <SalesDetailsModal sid={paginatedData[Index]?.sid} callback={() => { setIsSalesDetialsModal(false) }} />
                             </div>
                         )}
                         {/* Pagination */}

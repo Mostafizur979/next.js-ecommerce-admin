@@ -19,6 +19,7 @@ import { RiCloseCircleLine } from "react-icons/ri";
 import { ToastContainer, toast } from 'react-toastify';
 import CustomSelect from "@/components/UI/CustomSelect"
 import getCustomer from "@/lib/getCustomer";
+import Link from "next/link";
 export default function POS() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
@@ -286,7 +287,7 @@ export default function POS() {
               </div>
 
               <div className="bg-[#F9FAFB] w-full ml-[160px] pr-[5px]  h-[100vh] overflow-y-auto [scrollbar-width:thin] [scrollbar-color:#FE9F43_#FFE3CB]">
-                <div className="py-3 px-1 ">
+                <div className="py-3 px-1 flex justify-between items-center ">
                   <CustomInput
                     width="750"
                     type="search"
@@ -296,6 +297,9 @@ export default function POS() {
                     onChange={(e) => { setSearchData(e.target.value) }}
                     name="search"
                   />
+                  <div>
+                     <Link href="/sales" className="text-white text-[14px] p-2 bg-[#FE9F43] rounded-[5px]">Sales List</Link>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 p-[4px]">
