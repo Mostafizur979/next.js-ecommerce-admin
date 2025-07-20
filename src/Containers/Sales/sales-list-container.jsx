@@ -20,6 +20,7 @@ import CreatePaymentModal from "@/Modal/sales/sales-create-payment-modal";
 import SalesPaymentListModal from "@/Modal/sales/sales-payment-list-modal";
 import SalesDetailsModal from "@/Modal/sales/sales-details-modal";
 import { ToastContainer, toast } from 'react-toastify';
+import { useRouter } from "next/navigation";
 
 export default function SalesList() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -43,7 +44,7 @@ export default function SalesList() {
     let itemsPerPage = parseInt(numOfRows);
     const modalRef = useRef();
     const iconRef = useRef();
-
+    const router = useRouter();
     const handleClickOutside = (event) => {
         if (
             modalRef.current &&
@@ -165,7 +166,7 @@ export default function SalesList() {
                         </div>
 
                         {/* Table */}
-                        <div className="overflow-x-scroll lg:overflow-hidden relative overflow-y-auto" >
+                        <div className="overflow-x-scroll overflow-hidden relative overflow-y-auto" >
                             {sales[0]?.sid ?
                                 <table className="w-[800px] lg:w-full text-[14px] " >
                                     <thead>
@@ -235,7 +236,9 @@ export default function SalesList() {
                                 className="absolute right-[5%] bg-white p-4 rounded-[5px] shadow-lg z-10"
                             >
                                 <div className="flex gap-2 py-1 items-center cursor-pointer" onClick={() => { setIsSalesDetialsModal(true) }}><IoEyeOutline /> Sale Detail</div>
-                                <div className="flex gap-2 py-1 items-center cursor-pointer"><LiaEdit /> Sale Edit</div>
+                                <div className="flex gap-2 py-1 items-center cursor-pointer" onClick={()=>{
+                                    router.push({pathname:"/sales/edit", query: {id: paginatedData[Index]?.sid}});
+                                }}><LiaEdit /> Sale Edit</div>
                                 <div className="flex gap-2 py-1 items-center cursor-pointer"
                                     onClick={() => { setIsPayListModal(true) }}
                                 ><MdArrowOutward /> Show Payment</div>
@@ -253,7 +256,7 @@ export default function SalesList() {
                             </div>
                         )}
                         {isPayModal && (
-                            <div className="w-[600px] z-10 absolute right-[35%] top-[20%] bg-white p-4 rounded-[5px] shadow-lg border-1 border-gray-300 animate-zoomIn">
+                            <div className="w-[93%] lg:w-[600px] z-10 absolute lg:right-[35%] top-[40%] md:top-[20%] bg-white p-4 rounded-[5px] shadow-lg border-1 border-gray-300 animate-zoomIn">
                                 <CreatePaymentModal
                                     selected={selectedItems}
                                     handle={() => setIsPayModal(false)}
@@ -268,14 +271,14 @@ export default function SalesList() {
                         )}
 
                         {isPayListModal && (
-                            <div className="w-[600px] z-10 absolute right-[35%] top-[20%] bg-white p-4 rounded-[5px] shadow-lg border-1 border-gray-300 animate-zoomIn">
+                            <div className="w-[93%] lg:w-[600px] z-10 absolute lg:right-[35%] top-[38%] md:top-[30%] bg-white p-4 rounded-[5px] shadow-lg border-1 border-gray-300 animate-zoomIn">
                                 <SalesPaymentListModal sid={paginatedData[Index]?.sid} handlePaymentList={() => {
                                     setIsPayListModal(false)
                                 }} />
                             </div>
                         )}
                         {isSalesDetailsModal && (
-                            <div className="w-[80%] z-10 absolute right-[3%] top-[8%] bg-white p-4 rounded-[5px] shadow-lg border-1 border-gray-300 animate-zoomIn">
+                            <div className="w-full right-0  lg:w-[80%] z-10 absolute md:left-[270px] top-[12%] lg:top-[15%] bg-white p-4 rounded-[5px] shadow-lg border-1 border-gray-300 animate-zoomIn">
                                 <SalesDetailsModal sid={paginatedData[Index]?.sid} callback={() => { setIsSalesDetialsModal(false) }} />
                             </div>
                         )}

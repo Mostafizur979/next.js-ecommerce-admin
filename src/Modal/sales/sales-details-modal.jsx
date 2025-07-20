@@ -71,7 +71,7 @@ return (
                     <button className="bg-[#131C37] p-2 px-4 rounded-[5px] text-white text-[14px]" onClick={callback}>Back to Sales</button>
                 </div>
             </div>
-            <div className="grid grid-cols-3 gap-3 p-3">
+            <div className="grid md: grid-cols-2 lg:grid-cols-3 gap-3 p-3">
                 <div>
                     <h3 className="text-[15px] font-semibold py-2">Customer Info</h3>
                     <h2 className="text-[17px] font-semibold py-1">{customer.name}</h2>
@@ -84,7 +84,7 @@ return (
                     <p className="text-[14px] text-gray-600 py-1">Mirpur-10, Dhaka</p>
                     <p className="text-[14px] text-gray-600 py-1">Phone +8801767820520</p>
                 </div>
-                <div>
+                <div className="cols-span-2 md:col-span-1">
                     <h3 className="text-[15px] font-semibold py-2">Invoice Info</h3>
                     <div className="flex gap-2 py-1">
                         <p className="text-[14px] text-gray-600">Reference: </p>

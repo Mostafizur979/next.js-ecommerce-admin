@@ -40,6 +40,7 @@ export default function POS() {
   const [taxValue, setTaxValue] = useState(0);
   const [discountValue, setDiscountValue] = useState(0);
   const [isQr, setIsQr] = useState(false)
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -254,7 +255,6 @@ export default function POS() {
 
         <SideBar sidebarOpen={isSidebarOpen} sideBarHandle={sideBarHandle} />
 
-        {/* Dashboard Body */}
         <div className={`${collapsed ? "w-full ml-[0px] md:ml-[57px]" : "w-full ml-[0px] md:ml-[252px]"} duration-300 ease-in-out`}>
           <div className="md:hidden bg-white my-0 px-4 shadow-sm grid grid-cols-2 items-center sticky top-0 bottom-2  z-40">
             <button onClick={() => {
@@ -298,7 +298,7 @@ export default function POS() {
                     name="search"
                   />
                   <div>
-                     <Link href="/sales" className="text-white text-[14px] p-2 bg-[#FE9F43] rounded-[5px]">Sales List</Link>
+                    <Link href="/sales" className="text-white text-[14px] p-2 bg-[#FE9F43] rounded-[5px]">Sales List</Link>
                   </div>
                 </div>
 
@@ -338,6 +338,7 @@ export default function POS() {
                   value={inputs.customerMobile || ""}
                   onChange={handleChange}
                   placeholder=""
+                  isRequired="true"
                 />
 
 
@@ -360,7 +361,7 @@ export default function POS() {
                   onChange={handleChange}
                   placeholder=""
                 />
-
+              
                 <CustomInput
                   width="full"
                   label="District"

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function CustomInput({ width="full", label, name, type = "text", value = "", onChange, placeholder = "" }) {
+export default function CustomInput({ width="full", label, name, type = "text", value = "", onChange, placeholder = "", isRequired=false}) {
   const [isFocused, setIsFocused] = useState(false);
 
   const floatLabel = isFocused || value?.length > 0;
@@ -15,7 +15,7 @@ export default function CustomInput({ width="full", label, name, type = "text", 
           `}
           onClick={() => setIsFocused(true)}
         >
-          {label}
+          {label}{isRequired && <span className="text-red-600"> *</span>}
         </label>
       )}
       <input
