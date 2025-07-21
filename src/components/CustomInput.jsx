@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function CustomInput({ width="full", label, name, type = "text", value = "", onChange, placeholder = "", isRequired=false}) {
+export default function CustomInput({ width="full", label, name, type = "text", value = "", onChange, placeholder = "", isRequired = false, disabled = false}) {
   const [isFocused, setIsFocused] = useState(false);
 
   const floatLabel = isFocused || value?.length > 0;
@@ -27,7 +27,8 @@ export default function CustomInput({ width="full", label, name, type = "text", 
         onBlur={() => setIsFocused(false)}
         placeholder={floatLabel ? "" : placeholder}
         autoComplete="off"
-        className="w-full p-3 border border-gray-300 rounded-[5px] text-sm text-gray-700 outline-none"
+        className="w-full p-2 border border-gray-300 rounded-[5px] text-sm text-gray-700 outline-none"
+        readOnly = {disabled}
       />
     </div>
   );

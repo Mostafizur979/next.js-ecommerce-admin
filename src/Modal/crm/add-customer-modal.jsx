@@ -55,26 +55,30 @@ export default function AddCustomerModal({ selected, handle, callback }) {
     console.log(bdData)
 
     async function handleSubmit() {
-
+        debugger
         try {
-            const res = await fetch("http://127.0.0.1:8000/api/sales-payment/", {
+            const res = await fetch("http://127.0.0.1:8000/api/customer/", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
 
                 body: JSON.stringify({
-                    sid: selected.invId,
-                    method: method,
-                    amount: inputs.amount,
-                    addedBy: "Admin"
+                    name: inputs.name,
+                    mobile: inputs.phone,
+                    district: selectedDistrict,
+                    upazila: selectedUpazila
 
                 }),
             });
 
             const data = await res.json();
             if (data.status === 'success') {
-                callback();
+                let msg = 'Customer information added Successfully';
+                if(data.message == 0){
+                   msg = 'Duplicate phone number!'
+                }
+                callback(msg);
                 handle();
             } else {
                 alert(`Error: ${data?.message}`);
@@ -111,8 +115,12 @@ export default function AddCustomerModal({ selected, handle, callback }) {
                         onChange={(e) => { handleChange(e) }}
                     />
                     <CustomReactSelect label="Division" options={divisionOption} handleSelected={(division) => { handleDivisionChange(division.value) }} />
-                    <CustomReactSelect label="District" options={districtOption} handleSelected={(data) => { handleDistrictChange(data.value) }} />
-                    <CustomReactSelect label="Upazila" options={upazilaOption} handleSelected={(value) => { }} />
+                    <CustomReactSelect label="District" options={districtOption} 
+                      handleSelected={(data) => { 
+                        handleDistrictChange(data.value) 
+                        setSelectedDistrict(data.value)
+                        }} />
+                    <CustomReactSelect label="Upazila" options={upazilaOption} handleSelected={(data) => {setSelectedUpazila(data.value)}} />
 
 
                     <div className="col-span-2 flex gap-3 justify-end ">
