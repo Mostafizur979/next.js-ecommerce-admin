@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Select from 'react-select';
 
-export default function SelectComponent({ label="default label", options, handleSelected, isRequired = false, width = "full" }) {
+export default function SelectComponent({ label = "default label", options, handleSelected, isRequired = false, width = "full" }) {
   const [isClearable, setIsClearable] = useState(true);
   const [isSearchable, setIsSearchable] = useState(true);
   const [isDisabled, setIsDisabled] = useState(false);
@@ -60,6 +60,23 @@ export default function SelectComponent({ label="default label", options, handle
           valueContainer: (base) => ({
             ...base,
             paddingTop: 2
+          }),
+          // Change the background of selected item in dropdown
+          option: (base, state) => ({
+            ...base,
+            backgroundColor: state.isSelected ? '#FE9F43' : state.isFocused ? '#FFF3E0' : undefined,
+            color: state.isSelected ? 'white' : 'black',
+            '&:hover': {
+              backgroundColor: '#FFF3E0',
+              color: 'black',
+            },
+          }),
+          //  Style the displayed selected value
+          singleValue: (base) => ({
+            ...base,
+            color: 'black',
+            padding: '2px 6px',
+            borderRadius: '5px',
           }),
         }}
       />

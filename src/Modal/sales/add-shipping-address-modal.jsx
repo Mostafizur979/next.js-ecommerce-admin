@@ -2,8 +2,9 @@ import CustomInput from "@/components/CustomInput"
 import { useEffect, useState } from "react"
 import CustomReactSelect from '@/components/UI/CustomReactSelect';
 import bdData from "@/lib/bd-address-data.json";
-export default function AddCustomerModal({ selected, handle, callback }) {
-    const [inputs, setInputs] = useState({});
+export default function AddShippingAddressModal({ handle, callback, data="", provider="" }) {
+    const [phone, name] = data.split(" - ");
+    const [inputs, setInputs] = useState({ name: name, phone: phone, address:'' });
     const [method, setMethod] = useState('');
     const [selectedDivision, setSelectedDivision] = useState('');
     const [selectedDistrict, setSelectedDistrict] = useState('');
@@ -57,7 +58,7 @@ export default function AddCustomerModal({ selected, handle, callback }) {
     async function handleSubmit() {
         debugger
         try {
-            const res = await fetch("http://127.0.0.1:8000/api/customer/", {
+            const res = await fetch("http://127.0.0.1:8000/api/shipping/", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -65,19 +66,19 @@ export default function AddCustomerModal({ selected, handle, callback }) {
 
                 body: JSON.stringify({
                     name: inputs.name,
-                    mobile: inputs.phone,
+                    phone: inputs.phone,
+                    address: inputs.address,
+                    division: selectedDivision,
                     district: selectedDistrict,
-                    upazila: selectedUpazila
+                    upazila: selectedUpazila,
+                    provider: provider
 
                 }),
             });
 
             const data = await res.json();
             if (data.status === 'success') {
-                let msg = 'Customer information added Successfully';
-                if (data.message == 0) {
-                    msg = 'Duplicate phone number!'
-                }
+                let msg = 'Shipping address added Successfully';
                 callback(msg);
                 handle();
             } else {
@@ -94,7 +95,7 @@ export default function AddCustomerModal({ selected, handle, callback }) {
     return (
         <>
             <div>
-                <h2 className="text-[18px] font-semibold borde-b-1 border-gray-300 p-3">Add Customer</h2>
+                <h2 className="text-[18px] font-semibold borde-b-1 border-gray-300 p-3">Add Address</h2>
                 <div className="px-3 grid grid-cols-2 gap-3">
                     <div className="col-span-2 md:col-span-1">
                         <CustomInput
@@ -118,11 +119,25 @@ export default function AddCustomerModal({ selected, handle, callback }) {
                             onChange={(e) => { handleChange(e) }}
                         />
                     </div>
+                    <div className="col-span-2">
+                        <CustomInput
+                            width="full"
+                            label="Delivery Address"
+                            name="address"
+                            type="text"
+                            value={inputs.address}
+                            placeholder=""
+                            onChange={(e) => { handleChange(e) }}
+                        />
+                    </div>
                     <div className="col-span-2 md:col-span-1">
                         <CustomReactSelect
                             label="Division"
                             options={divisionOption}
-                            handleSelected={(division) => { handleDivisionChange(division.value) }} />
+                            handleSelected={(division) => {
+                                setSelectedDivision(division.value);
+                                handleDivisionChange(division.value)
+                             }} />
                     </div>
                     <div className="col-span-2 md:col-span-1">
                         <CustomReactSelect
