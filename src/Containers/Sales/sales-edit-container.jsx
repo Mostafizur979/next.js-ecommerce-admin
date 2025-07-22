@@ -48,6 +48,9 @@ export default function SalesUpdate() {
     const [netTotal, setNetTotal] = useState(0);
     const [invoiceNote, setInvoiceNote] = useState('');
     const [isShippingAddress, setIsShippingAddress] = useState(false);
+    const [shippingAddress, setShippingAddress] = useState([]);
+    const [selectedShippingAddress, setSelectedShippingAddress] = useState({});
+    const [shippingPrice, setShippingPrice] = useState(0);
     const toggleSidebar = (val) => {
         if (val == "open") {
             setIsSidebarOpen(true);
@@ -90,11 +93,11 @@ export default function SalesUpdate() {
     useEffect(() => {
         async function ShippingAddress() {
             const [phone, name] = selectedCustomer.label.split(" - ");
-            const dataList = await getShippingAddress(phone);
-            console.log("address: "+dataList)
+            const dataList = await getShippingAddress(phone, selectedProvider);
+            setShippingAddress(dataList);
         }
-        ShippingAddress()
-    }, [selectedCustomer])
+        ShippingAddress();
+    }, [selectedCustomer, selectedProvider])
 
     const handleProductChange = (productId) => {
         const product = products.find(prod => prod.SKU == productId);
@@ -127,7 +130,6 @@ export default function SalesUpdate() {
         let subTotal = 0;
         let discountAmount = 0;
         let vatAmount = 0;
-        let netPrice = 0;
         items.map((data) => {
             subTotal = subTotal + parseFloat(data.price) * parseInt(data.qty);
             discountAmount = discountAmount + parseFloat(data.discount) * parseInt(data.qty);
@@ -136,14 +138,21 @@ export default function SalesUpdate() {
         setDiscount(discountAmount);
         setVat(vatAmount);
         setSubTotal(subTotal);
-        setNetTotal(subTotal + vatAmount - discountAmount);
-    }, [items])
+        setNetTotal(subTotal + vatAmount - discountAmount + parseFloat(shippingPrice || 0));
+    }, [items, shippingPrice])
     const handleChange = (value, index, name) => {
         const tempProduct = [...items];
         if (name == 'qty' && value > tempProduct[index].stock) {
             toast.warn("Sales quantity should be less than or equal to stock quantity", {
                 autoClose: 1500
             })
+            return
+        }
+        else if (name == 'qty' && value < 0) {
+            toast.warn("Sales quantity can't be negative", {
+                autoClose: 1500
+            })
+            return
         }
         tempProduct[index][name] = value;
         tempProduct[index].total = (parseFloat(tempProduct[index].price) + parseFloat(tempProduct[index].vat) - parseFloat(tempProduct[index].discount)) * parseInt(tempProduct[index].qty);
@@ -230,7 +239,9 @@ export default function SalesUpdate() {
                                     label="Shipment Provider"
                                     isRequired={true}
                                     options={[{ value: "Own Provider", label: "Own Provider" }, { value: "Pathao", label: "Pathao" }, { value: "Stead Fast", label: "Stead Fast" }]}
-                                    handleSelected={(data) => { setSelectedProvider(data.value) }} />
+                                    handleSelected={(data) => {
+                                        setSelectedProvider(data.value)
+                                    }} />
                             </div>
 
                         </div>
@@ -318,19 +329,33 @@ export default function SalesUpdate() {
                                     </div>
                                     <div className='flex justify-end'>
                                         <div className='w-60'>
-                                            <div className='py-1 flex justify-between text-gray-500 font-semibold text-[15px]'>
+                                            <div className='pt-3 flex justify-between text-gray-500 font-semibold text-[15px]'>
                                                 <p>Sub Total</p>
                                                 <p>{!Number.isNaN(subTotal) ? subTotal : 0}</p>
                                             </div>
-                                            <div className='py-1 flex justify-between text-gray-500 font-semibold text-[15px]'>
+                                            <div className='py-3 flex justify-between text-gray-500 font-semibold text-[15px]'>
                                                 <p>Discount</p>
                                                 <p>{!Number.isNaN(discount) ? discount : 0}</p>
                                             </div>
-                                            <div className='py-1 flex justify-between text-gray-500 font-semibold text-[15px]'>
+                                            <div className='pt-3 flex justify-between text-gray-500 font-semibold text-[15px]'>
                                                 <p>Vat</p>
                                                 <p>{!Number.isNaN(vat) ? vat : 0}</p>
                                             </div>
-                                            <div className='py-1 flex justify-between text-gray-500 border-t-[1px] mt-1 border-gray-300 font-semibold text-[15px]'>
+                                            <div className='pt-3 flex items-center justify-between text-gray-500 font-semibold text-[15px]'>
+                                                <p>Shipping Cost<span className='text-red-600'>*</span></p>
+                                                <div className='max-w-[100px]'>
+                                                    <input
+                                                        type="number"
+                                                        className="w-[105px] border-[1px] outline-0 rounded-[5px] text-right border-gray-300 p-1 
+                                                                    [&::-webkit-inner-spin-button]:appearance-none 
+                                                                    [&::-webkit-outer-spin-button]:appearance-none 
+                                                                    [-moz-appearance:textfield]"
+                                                        onChange={(e)=>{setShippingPrice(e.target.value)}}             
+                                                    />
+
+                                                </div>
+                                            </div>
+                                            <div className='pt-3 flex justify-between text-gray-500 border-t-[1px] mt-1 border-gray-300 font-semibold text-[15px]'>
                                                 <p>Net Total</p>
                                                 <p>{!Number.isNaN(netTotal) ? netTotal : 0}</p>
                                             </div>
@@ -350,6 +375,24 @@ export default function SalesUpdate() {
                                     <p className='text-[15px]'>Add Address</p>
                                 </div>
                             </div>
+                            <div>
+                                {
+                                    shippingAddress.map((data, index) => (
+                                        <div className='flex gap-4 py-3 items-center'>
+                                            <div><input type="radio" name="currentShippingAddress" value={data} onChange={(e) => { setSelectedShippingAddress(e.target.value) }} /></div>
+                                            <div className='w-full bg-gray-50 p-3 text-[14px] text-gray-800 shadow-lg rounded-[10px]'>
+                                                <p>{data.cName}</p>
+                                                <p>{data.cPhone}</p>
+                                                <p>{data.address}</p>
+                                                <p>{data.upazila}, {data.district}</p>
+                                            </div>
+                                        </div>
+                                    ))
+                                }
+                            </div>
+                        </div>
+                        <div className='flex justify-end '>
+                             <button className='w-full md:w-[130px] text-md text-white p-2 rounded-[5px]  bg-[#FE9F43] '>Place Order</button>
                         </div>
                     </div>
                     {isAddCustomer && (

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import CustomReactSelect from '@/components/UI/CustomReactSelect';
 import bdData from "@/lib/bd-address-data.json";
 export default function AddShippingAddressModal({ handle, callback, data="", provider="" }) {
+    debugger 
     const [phone, name] = data.split(" - ");
     const [inputs, setInputs] = useState({ name: name, phone: phone, address:'' });
     const [method, setMethod] = useState('');
@@ -39,7 +40,6 @@ export default function AddShippingAddressModal({ handle, callback, data="", pro
         const upazilaData = [];
         upazilas.map((upazila, index) => {
             upazilaData.push({ value: upazila, label: upazila })
-            console.log("Up: " + upazila);
         })
         setUpazilaOption(upazilaData)
 
