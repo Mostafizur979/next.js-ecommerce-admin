@@ -22,6 +22,7 @@ import getCustomer from '@/lib/getCustomer';
 import AddCustomerModal from '@/Modal/crm/add-customer-modal';
 import AddShippingAddressModal from '@/Modal/sales/add-shipping-address-modal';
 import getShippingAddress from '@/lib/getShippingAddress';
+import CreateSalesDetailsModal from '@/Modal/sales/create-sales-details-modal';
 function formatDateToDDMMYYYY(dateObj) {
     const day = String(dateObj.getDate()).padStart(2, '0');
     const month = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -51,6 +52,7 @@ export default function SalesUpdate() {
     const [shippingAddress, setShippingAddress] = useState([]);
     const [selectedShippingAddress, setSelectedShippingAddress] = useState({});
     const [shippingPrice, setShippingPrice] = useState(0);
+    const [isSalesDetails, setIsSalesDetails] = useState(false);
     const toggleSidebar = (val) => {
         if (val == "open") {
             setIsSidebarOpen(true);
@@ -112,7 +114,7 @@ export default function SalesUpdate() {
             id: product.SKU,
             name: product.Pname,
             unit: product.Unit,
-            qty: '0',
+            qty: '1',
             stock: product.QtyAlert,
             price: product.Price,
             discount: product.Price * product.DiscountValue / 100,
@@ -350,7 +352,7 @@ export default function SalesUpdate() {
                                                                     [&::-webkit-inner-spin-button]:appearance-none 
                                                                     [&::-webkit-outer-spin-button]:appearance-none 
                                                                     [-moz-appearance:textfield]"
-                                                        onChange={(e)=>{setShippingPrice(e.target.value)}}             
+                                                        onChange={(e) => { setShippingPrice(e.target.value) }}
                                                     />
 
                                                 </div>
@@ -392,7 +394,9 @@ export default function SalesUpdate() {
                             </div>
                         </div>
                         <div className='flex justify-end '>
-                             <button className='w-full md:w-[130px] text-md text-white p-2 rounded-[5px]  bg-[#FE9F43] '>Place Order</button>
+                            <button 
+                               onClick={()=>{setIsSalesDetails(true)}}
+                               className='w-full md:w-[130px] text-md text-white p-2 rounded-[5px]  bg-[#FE9F43] cursor-pointer '>Place Order</button>
                         </div>
                     </div>
                     {isAddCustomer && (
@@ -422,6 +426,20 @@ export default function SalesUpdate() {
                                     setSync(!sync)
                                 }}
                             />
+                        </div>
+                    )}
+                    {isSalesDetails && (
+                        <div className="w-full right-0  lg:w-[80%] z-10 absolute md:left-[270px] top-[12%] lg:top-[8%] bg-white p-4 rounded-[5px] shadow-lg border-1 border-gray-300 animate-zoomIn">
+                            <CreateSalesDetailsModal 
+                                items={items} 
+                                subTotal={subTotal || 0}
+                                discount={discount || 0}
+                                vat={vat || 0}
+                                netTotal={netTotal || 0}
+                                shippingPrice={shippingPrice || 0}
+                                customer={shippingAddress} 
+                                callback={() => { setIsSalesDetails(false) }}
+                                 />
                         </div>
                     )}
                 </div>
