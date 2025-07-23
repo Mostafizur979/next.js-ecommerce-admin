@@ -99,7 +99,7 @@ export default function SalesUpdate() {
             setShippingAddress(dataList);
         }
         ShippingAddress();
-    }, [selectedCustomer, selectedProvider])
+    }, [selectedCustomer, selectedProvider, sync])
 
     const handleProductChange = (productId) => {
         const product = products.find(prod => prod.SKU == productId);
@@ -119,7 +119,7 @@ export default function SalesUpdate() {
             price: product.Price,
             discount: product.Price * product.DiscountValue / 100,
             vat: '0',
-            total: 0,
+            total: product.Price - product.Price * product.DiscountValue / 100,
             image: product.Image
         }]))
     }
@@ -133,9 +133,9 @@ export default function SalesUpdate() {
         let discountAmount = 0;
         let vatAmount = 0;
         items.map((data) => {
-            subTotal = subTotal + parseFloat(data.price) * parseInt(data.qty);
-            discountAmount = discountAmount + parseFloat(data.discount) * parseInt(data.qty);
-            vatAmount = vatAmount + parseFloat(data.vat) * parseInt(data.qty);
+            subTotal = subTotal + parseFloat(data.price || 0) * parseInt(data.qty);
+            discountAmount = discountAmount + parseFloat(data.discount || 0) * parseInt(data.qty);
+            vatAmount = vatAmount + parseFloat(data.vat || 0) * parseInt(data.qty);
         })
         setDiscount(discountAmount);
         setVat(vatAmount);
@@ -144,6 +144,7 @@ export default function SalesUpdate() {
     }, [items, shippingPrice])
     const handleChange = (value, index, name) => {
         const tempProduct = [...items];
+        debugger
         if (name == 'qty' && value > tempProduct[index].stock) {
             toast.warn("Sales quantity should be less than or equal to stock quantity", {
                 autoClose: 1500
@@ -156,8 +157,25 @@ export default function SalesUpdate() {
             })
             return
         }
+        else if (name == 'discount' && value > parseFloat(tempProduct[index].price)) {
+            toast.warn('Discount amount should be less than sales price', { autoClose: 1500 })
+            return
+        }
+        else if (name == 'discount' && value < 0) {
+            toast.warn("Discount amount should be positive", { autoClose: 1500 })
+            return
+        }
+        else if (name == 'vat' && value > parseFloat(tempProduct[index].price)) {
+            toast.warn("Vat amount should be less than sales price", { autoClose: 1500 })
+            return
+        }
+        else if (name == 'vat' && value < 0) {
+            toast.warn("Vat amount should be positive", { autoClose: 1500 })
+            return
+        }
+
         tempProduct[index][name] = value;
-        tempProduct[index].total = (parseFloat(tempProduct[index].price) + parseFloat(tempProduct[index].vat) - parseFloat(tempProduct[index].discount)) * parseInt(tempProduct[index].qty);
+        tempProduct[index].total = (parseFloat(tempProduct[index].price || 0) + parseFloat(tempProduct[index].vat || 0) - parseFloat(tempProduct[index].discount || 0)) * parseInt(tempProduct[index].qty);
         setItems(tempProduct);
     }
 
@@ -381,7 +399,7 @@ export default function SalesUpdate() {
                                 {
                                     shippingAddress.map((data, index) => (
                                         <div className='flex gap-4 py-3 items-center'>
-                                            <div><input type="radio" name="currentShippingAddress" value={data} onChange={(e) => { setSelectedShippingAddress(e.target.value) }} /></div>
+                                            <div><input type="radio" name="currentShippingAddress" value={data} onChange={() => { setSelectedShippingAddress(index) }} /></div>
                                             <div className='w-full bg-gray-50 p-3 text-[14px] text-gray-800 shadow-lg rounded-[10px]'>
                                                 <p>{data.cName}</p>
                                                 <p>{data.cPhone}</p>
@@ -394,9 +412,9 @@ export default function SalesUpdate() {
                             </div>
                         </div>
                         <div className='flex justify-end '>
-                            <button 
-                               onClick={()=>{setIsSalesDetails(true)}}
-                               className='w-full md:w-[130px] text-md text-white p-2 rounded-[5px]  bg-[#FE9F43] cursor-pointer '>Place Order</button>
+                            <button
+                                onClick={() => { setIsSalesDetails(true) }}
+                                className='w-full md:w-[130px] text-md text-white p-2 rounded-[5px]  bg-[#FE9F43] cursor-pointer '>Place Order</button>
                         </div>
                     </div>
                     {isAddCustomer && (
@@ -430,16 +448,21 @@ export default function SalesUpdate() {
                     )}
                     {isSalesDetails && (
                         <div className="w-full right-0  lg:w-[80%] z-10 absolute md:left-[270px] top-[12%] lg:top-[8%] bg-white p-4 rounded-[5px] shadow-lg border-1 border-gray-300 animate-zoomIn">
-                            <CreateSalesDetailsModal 
-                                items={items} 
+                            <CreateSalesDetailsModal
+                                items={items}
                                 subTotal={subTotal || 0}
                                 discount={discount || 0}
                                 vat={vat || 0}
                                 netTotal={netTotal || 0}
                                 shippingPrice={shippingPrice || 0}
-                                customer={shippingAddress} 
+                                shippingAddress={shippingAddress[selectedShippingAddress]}
                                 callback={() => { setIsSalesDetails(false) }}
-                                 />
+                                successFull={() => {
+                                    toast.success("Invoice Created  Successfully", {
+                                        autoClose: 2000
+                                    });
+                                }}
+                            />
                         </div>
                     )}
                 </div>

@@ -1,12 +1,68 @@
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { LuPrinter } from "react-icons/lu";
-import getSales from "@/lib/getSales";
-import getProducts from "@/lib/getProductList";
 import { imagePath } from "@/assets";
-import getCustomer from "@/lib/getCustomer";
-export default function CreateSalesDetailsModal({ items, customer, callback, subTotal, discount, vat, shippingPrice, netTotal }) {
+import { useState } from "react";
+export default function CreateSalesDetailsModal({ items, shippingAddress, callback, subTotal, discount, vat, shippingPrice, netTotal, successFull }) {
+    const router =  useRouter();
+    debugger
+    async function handleSubmit() {
+        let pid = [];
+        let size = 0;
+        let qty = {};
+        let prices = [];
+        let taxes = [];
+        let discounts = [];
 
+        items.map((product) => {
+            pid.push(product.id);
+            size = size + parseInt(product.qty);
+            qty = {...qty, [product.id] : product.qty};
+            prices.push(product.price);
+            taxes.push(product.vat);
+            discounts.push(product.discount)
+        })
+        
 
+        try {
+            const res = await fetch("http://127.0.0.1:8000/api/sales/", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+
+                body: JSON.stringify({
+                    pid: pid,
+                    qty: qty,
+                    size: size,
+                    price: subTotal,
+                    tax: vat,
+                    shipping: shippingPrice,
+                    discount: discount,
+                    address: shippingAddress.address,
+                    cName: shippingAddress.cName,
+                    cMobile: shippingAddress.cPhone,
+                    cUpazila: shippingAddress.upazila,
+                    cDistrict: shippingAddress.district,
+                    individualPrice: prices,
+                    individualTax: taxes,
+                    indivualDiscount: discounts
+                }),
+            });
+
+            const data = await res.json();
+            if (data?.status === 'success') {
+                successFull();
+                router.push("/sales");
+            
+            } else {
+                alert(`Error: ${data?.message}`);
+            }
+
+        } catch (error) {
+            console.error('Fetch error:', error);
+            alert("Failed to submit");
+        }
+    }
     return (
         <>
             <div>
@@ -20,9 +76,10 @@ export default function CreateSalesDetailsModal({ items, customer, callback, sub
                 <div className="grid md: grid-cols-2 lg:grid-cols-3 gap-3 p-3">
                     <div>
                         <h3 className="text-[15px] font-semibold py-2">Customer Info</h3>
-                        <h2 className="text-[17px] font-semibold py-1">{customer.name}</h2>
-                        <p className="text-[14px] text-gray-600 py-1">{customer.upazila}, {customer.district}</p>
-                        <p className="text-[14px] text-gray-600 py-1">Phone {customer.phone}</p>
+                        <h2 className="text-[17px] font-semibold py-1">{shippingAddress?.cName}</h2>
+                        <p className="text-[14px] text-gray-600 py-1">{shippingAddress?.address}</p>
+                        <p className="text-[14px] text-gray-600 py-1">{shippingAddress?.upazila}, {shippingAddress?.district}</p>
+                        <p className="text-[14px] text-gray-600 py-1">Phone {shippingAddress?.cPhone}</p>
                     </div>
                     <div>
                         <h3 className="text-[15px] font-semibold py-2">Company Info</h3>
@@ -69,10 +126,10 @@ export default function CreateSalesDetailsModal({ items, customer, callback, sub
 
                             <tbody className="border-b-[1px] border-gray-300">
                                 {
-                                    items.map((data,index) => (
+                                    items?.map((data, index) => (
                                         <tr>
                                             <td className="p-2 flex gap-2 items-center">
-                                                <span className="pr-5">{index+1}</span>
+                                                <span className="pr-5">{index + 1}</span>
                                                 <img src={data.image == "no-image" ? imagePath.noImage : `data:image/png;base64,${data.image}`} className="h-[30px] w-[30px]" alt="product" />
                                                 {data.name}
                                             </td>
@@ -115,6 +172,10 @@ export default function CreateSalesDetailsModal({ items, customer, callback, sub
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                    <div>
+                        <button className="bg-[#D1D5DB] p-2 px-4 mr-4 text-red-600 rounded-[10px] cursor-pointer" onClick={callback}>Cancel</button>
+                        <button className="bg-[#FE9F43] p-2 px-6 text-white rounded-[10px] cursor-pointer" onClick={handleSubmit}>Save</button>
                     </div>
                 </div>
             </div>

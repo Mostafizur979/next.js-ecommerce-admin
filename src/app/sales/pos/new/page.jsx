@@ -20,6 +20,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import CustomSelect from "@/components/UI/CustomSelect"
 import getCustomer from "@/lib/getCustomer";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 export default function POS() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
@@ -29,18 +30,13 @@ export default function POS() {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [searchData, setSearchData] = useState("");
   const [inputs, setInputs] = useState({});
-  const [cartItems, setCartItems] = useState([]);
-  const [cartItemQty, setCartItemQty] = useState({})
   const [cartLen, setCartLen] = useState(0);
-  const [tax, setTax] = useState(0);
-  const [shippingCost, setShippingCost] = useState(0);
   const [discount, setDiscount] = useState(0);
   const [subTotal, setSubTotal] = useState(0);
-  const [total, seTotal] = useState(0);
-  const [taxValue, setTaxValue] = useState(0);
-  const [discountValue, setDiscountValue] = useState(0);
-  const [isQr, setIsQr] = useState(false)
-
+  const [isQr, setIsQr] = useState(false);
+  const [netTotal,setNetTotal] = useState(0);
+  const [cartItems, setCartItems] = useState([]);
+  const router = useRouter();
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -109,145 +105,134 @@ export default function POS() {
     }
   }
 
-  const handleCart = (sku) => {
-    console.log("Product added to cart with SKU:", sku);
-    let status = false;
-    cartItems.forEach((product, index) => {
-      if (product.SKU == sku) {
-        status = true;
-      }
-    })
-    if (status) {
-      toast("Already product added into cart", {
-        autoClose: 1500
-      })
+  const handleCart = (productId) => {
+    const product = filteredProducts.find(prod => prod.SKU == productId);
+    const isExist = cartItems.find(data => data.id == productId);
+    if (isExist?.id == productId) {
+      toast.warn('Already added this product', { autoClose: 1500 })
+      return
     }
-    else {
-      products.map((product) => {
-        if (product.SKU == sku) {
-          setCartItems(prev => ([...prev, product]))
-          setCartItemQty(prev => ({ ...prev, [sku]: 1 }))
-          setSubTotal(subTotal + product.Price);
-        }
-      })
-    }
+    setCartItems(prev =>
+    ([...prev,
+    {
+      id: product.SKU,
+      name: product.Pname,
+      unit: product.Unit,
+      qty: 1,
+      stock: product.QtyAlert,
+      price: product.Price,
+      discount: product.Price * product.DiscountValue / 100,
+      vat: '0',
+      total: product.Price - product.Price * product.DiscountValue / 100,
+      image: product.Image
+    }]))
   }
+  const removeCartItem = (pId) => {
+    debugger
+    const newItems = cartItems.filter(prod => prod.id != pId);
+    console.log("NewItems: " + newItems)
+    setCartItems(newItems);
+  }
+
+  const increaseCartQty = (index) => {
+    const tempProduct = [...cartItems];
+    tempProduct[index].qty = tempProduct[index].qty + 1;
+    tempProduct[index].total = (parseFloat(tempProduct[index].price || 0) + parseFloat(tempProduct[index].vat || 0) - parseFloat(tempProduct[index].discount || 0)) * parseInt(tempProduct[index].qty);
+    setCartItems(tempProduct)
+  }
+
+  const decreaseCartQty = (index) => {
+    const tempProduct = [...cartItems];
+    tempProduct[index].qty = tempProduct[index].qty - 1;
+    tempProduct[index].total = (parseFloat(tempProduct[index].price || 0) + parseFloat(tempProduct[index].vat || 0) - parseFloat(tempProduct[index].discount || 0)) * parseInt(tempProduct[index].qty);
+    setCartItems(tempProduct)
+  }
+
   useEffect(() => {
     setCartLen(cartItems.length)
   }, [cartItems])
 
-  const increaseCartQty = (sku) => {
-    let qty = cartItemQty[sku] + 1
-    setCartItemQty(prev => ({ ...prev, [sku]: qty }))
-    cartItems.map((product, index) => {
-      console.log("Cart Qty: " + product.Qty)
-      if (product.SKU == sku) {
-        setSubTotal(subTotal + product.Price);
-      }
-    })
-  }
-
-  const decreaseCartQty = (sku) => {
-    let qty = cartItemQty[sku]
-    if (qty > 1) {
-      qty = qty - 1
-      cartItems.map((product) => {
-        if (product.SKU == sku) {
-          setSubTotal(subTotal - product.Price);
-        }
-      })
-    }
-    setCartItemQty(prev => ({ ...prev, [sku]: qty }))
-  }
-
-  const removeCartItem = (sku) => {
-    setCartItems(prev => prev.filter(product => product.SKU != sku));
-    setCartItemQty(prev => {
-      const updatedQty = { ...prev };
-      delete updatedQty[sku];
-      return updatedQty;
-    });
-    cartItems.map((product) => {
-      if (product.SKU == sku) {
-        setSubTotal(subTotal - product.Price * cartItemQty[sku]);
-      }
-    })
-  };
-
-  const handleTax = (e) => {
-    setTax(e.target.value)
-    setTaxValue(subTotal * e.target.value / 100)
-  }
-  const handleShipping = (e) => {
-    setShippingCost(e.target.value)
-  }
-  const handleDiscount = (e) => {
-    setDiscount(e.target.value)
-    setDiscountValue(subTotal * e.target.value / 100)
-  }
-
   useEffect(() => {
-    setTaxValue(subTotal * tax / 100)
-    setDiscountValue(subTotal * discount / 100)
-
-  }, [subTotal])
-
-  async function handleSubmit() {
-    let pid = [];
-    let size = 0;
-    cartItems.map((product) => {
-      pid.push(product.SKU)
+    let subTotal = 0;
+    let discountAmount = 0;
+    let vatAmount = 0;
+    cartItems.map((data) => {
+      subTotal = subTotal + parseFloat(data.price || 0) * parseInt(data.qty);
+      discountAmount = discountAmount + parseFloat(data.discount || 0) * parseInt(data.qty);
+      vatAmount = vatAmount + parseFloat(data.vat || 0) * parseInt(data.qty);
     })
-    for (let sku in cartItemQty) {
-      size = size + cartItemQty[sku]
+    setDiscount(discountAmount)
+    setSubTotal(subTotal);
+    setNetTotal(subTotal + vatAmount - discountAmount);
+  }, [cartItems])
+
+
+ async function handleSubmit() {
+        let pid = [];
+        let size = 0;
+        let qty = {};
+        let prices = [];
+        let taxes = [];
+        let discounts = [];
+        cartItems.map((product) => {
+            pid.push(product.id);
+            size = size + parseInt(product.qty);
+            qty = {...qty, [product.id] : product.qty};
+            prices.push(product.price);
+            taxes.push(product.vat);
+            discounts.push(product.discount)
+        })
+        debugger
+        if(!inputs.customerMobile || !inputs.customerName || !inputs.customerUpazila || !inputs.customerDistrict || !inputs.customerDelivery ) {
+          toast.warn("Please fill all required field")
+          return 
+        }
+        if(inputs.customerMobile.length == 0 || inputs.customerName.length == 0 || inputs.customerUpazila.length == 0 || inputs.customerDistrict.length == 0 || inputs.customerDelivery.length == 0){
+          toast.warn("Please fill all required field")
+          return 
+        }
+        
+
+        try {
+            const res = await fetch("http://127.0.0.1:8000/api/sales/", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+
+                body: JSON.stringify({
+                    pid: pid,
+                    qty: qty,
+                    size: size,
+                    price: subTotal,
+                    tax: 0,
+                    shipping: 0,
+                    discount: discount,
+                    address: inputs.customerDelivery,
+                    cName: inputs.customerName,
+                    cMobile: inputs.customerMobile ,
+                    cUpazila: inputs.customerUpazila,
+                    cDistrict: inputs.customerDistrict,
+                    individualPrice: prices,
+                    individualTax: taxes,
+                    indivualDiscount: discounts
+                }),
+            });
+
+            const data = await res.json();
+            if (data?.status === 'success') {
+                toast.success("Successfully Added Sales",{autoClose: 1500})
+                router.push("/sales");
+            
+            } else {
+                alert(`Error: ${data?.message}`);
+            }
+
+        } catch (error) {
+            console.error('Fetch error:', error);
+            alert("Failed to submit");
+        }
     }
-
-    try {
-      const res = await fetch("http://127.0.0.1:8000/api/sales/", {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-
-        body: JSON.stringify({
-          pid: pid,
-          qty: cartItemQty,
-          size: size,
-          price: subTotal,
-          tax: taxValue,
-          shipping: shippingCost,
-          discount: discountValue,
-          address: inputs.customerDelivery,
-          cName: inputs.customerName,
-          cMobile: inputs.customerMobile,
-          cUpazila: inputs.customerUpazila,
-          cDistrict: inputs.customerDistrict
-        }),
-      });
-
-      const data = await res.json();
-      if (data.status === 'success') {
-        toast.success("Invoice Created  Successfully", {
-          autoClose: 1500
-        });
-        setInputs({});
-        setCartItems([]);
-        setCartItemQty({});
-        setTax(0);
-        setDiscount(0);
-        setShippingCost(0);
-        setSubTotal(0);
-        setTaxValue(0);
-        setDiscountValue(0);
-      } else {
-        alert(`Error: ${data?.message}`);
-      }
-
-    } catch (error) {
-      console.error('Fetch error:', error);
-      alert("Failed to submit");
-    }
-  }
 
   return (
     <>
@@ -269,8 +254,8 @@ export default function POS() {
             </button>
             <Image src={imagePath.logo} alt="logo" width={235} height={48} />
           </div>
-          <div className="w-full grid grid-cols-3">
-            <div className="col-span-2 flex gap-3">
+          <div className="w-full grid grid-cols-4">
+            <div className="col-span-3 flex gap-3">
               <div className="m-1 w-[150px] fixed flex flex-col gap-3 justify-center items-center border-r-[1px] border-gray-300 h-[100vh] pt-[800px] overflow-y-auto [scrollbar-width:thin] [scrollbar-color:#FE9F43_#FFE3CB]">
                 {categories.map((category) => (
                   <div key={category.id} className="max-w-[100px] p-2 flex flex-col  justify-center items-center bg-white  border border-gray-300 rounded-[10px] text-gray-600 hover:text-[#FE9F43] 
@@ -302,12 +287,12 @@ export default function POS() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 p-[4px]">
+                <div className="grid grid-cols-2 xl:grid-cols-4 2xl:grid-cols-6 gap-4 p-[4px]">
                   {
                     products.map((product) => (
                       <div key={product.SKU}
                         onClick={() => { handleCart(product.SKU) }}
-                        className="bg-white border p-5 border-gray-200 rounded-[10px] hover:border-green-600 duration-300 ease-in-out" >
+                        className="bg-white relative border p-5 border-gray-200 rounded-[10px] hover:border-green-600 duration-300 ease-in-out" >
                         <div className="flex justify-center items-center mb-6">
                           <img src={product.Image == "no-image" ? imagePath.noImage : `data:image/png;base64,${product.Image}`} className="h-[150px] w-[150px] object-contain" alt="product" />
                         </div>
@@ -317,6 +302,7 @@ export default function POS() {
                           <p className="text-[14px] font-semibold text-green-700">$ {product.Price}</p>
                           <p className="text-[14px] text-red-600"> {product.QtyAlert} {product.Unit}</p>
                         </div>
+                        <div className="absolute top-2 right-0 text-[12px] bg-green-600 text-white p-1 ">{product.DiscountValue}%</div>
                       </div>
                     ))
                   }
@@ -361,7 +347,7 @@ export default function POS() {
                   onChange={handleChange}
                   placeholder=""
                 />
-              
+
                 <CustomInput
                   width="full"
                   label="District"
@@ -391,25 +377,34 @@ export default function POS() {
                   <div className="grid grid-cols-7 gap-6 mt-4 items-center bg-white border-1 border-gray-300 rounded-[5px] p-3">
                     <div className="col-span-4 grid grid-cols-4 items-center gap-2">
                       <div className="bg-[#FAFBFE] p-2 rounded-[10px] max-h-[82px]">
-                        <img src={product.Image == "no-image" ? imagePath.noImage : `data:image/png;base64,${product.Image}`} className="h-[50px] w-[50px] object-contain" alt="product" />
+                        <img src={product.image == "no-image" ? imagePath.noImage : `data:image/png;base64,${product.image}`} className="h-[50px] w-[50px] object-contain" alt="product" />
                       </div>
                       <div className="col-span-3">
-                        <p className="p-1 inline bg-[#FE9F43] text-white text-[12px] rounded-[5px]">{product.SKU}</p>
-                        <p className="text-[14px] text-gray-800 font-semibold">{product.Pname}</p>
-                        <p className="flex items-center text-[14px] text-green-700 font-semibold"><TbCurrencyTaka size={16} />{product.Price}</p>
+                        <p className="p-1 inline bg-[#FE9F43] text-white text-[12px] rounded-[5px]">{product.id}</p>
+                        <p className="text-[14px] text-gray-800 font-semibold">{product.name}</p>
+                        <p className="flex gap-2 text-[14px] text-green-700 font-semibold">
+                          <div className="flex">
+                            <TbCurrencyTaka size={16} />
+                            {product.total}
+                          </div>
+                          <div className="flex text-gray-500 text-[12px] line-through">
+                            <TbCurrencyTaka size={16} />
+                            {product.price*product.qty}
+                          </div>
+                        </p>
                       </div>
                     </div>
                     <div className="col-span-2 flex justify-between items-center bg-[#E6EAED] rounded-[5px] p-2">
-                      <FiMinusCircle size={16} onClick={() => { decreaseCartQty(product.SKU) }} />
-                      <div className="text-gray-600 text-[14px]">{cartItemQty[product.SKU]}</div>
-                      <FiPlusCircle size={16} onClick={() => { increaseCartQty(product.SKU) }} />
+                      <FiMinusCircle size={16} onClick={() => { decreaseCartQty(index) }} />
+                      <div className="text-gray-600 text-[14px]">{product.qty}</div>
+                      <FiPlusCircle size={16} onClick={() => { increaseCartQty(index) }} />
                     </div>
-                    <div className="flex justify-end "><RiDeleteBin6Line size={16} onClick={() => { removeCartItem(product.SKU) }} /></div>
+                    <div className="flex justify-end "><RiDeleteBin6Line size={16} onClick={() => { removeCartItem(product.id) }} /></div>
                   </div>
                 ))}
                 {/* Order Cart Items End */}
               </div>
-              <div className="grid grid-cols-3 gap-3 mt-4">
+              {/* <div className="grid grid-cols-3 gap-3 mt-4">
                 <CustomSelect
                   label="Order Tax"
                   options={[
@@ -451,14 +446,14 @@ export default function POS() {
                   value={discount}
                   handleSelect={(e) => handleDiscount(e)}
                 />
-              </div>
+              </div> */}
               <div className="grid grid-cols-2 text-[15px] text-gray-600 bg-[#F9FAFB] mt-3 p-3">
                 <p className="py-2">Sub Total</p><p className="flex items-center justify-end"><TbCurrencyTaka size={20} /> {subTotal}</p>
-                <p className="py-2">Tax {`(GST ${tax}%)`}</p><p className="flex items-center justify-end"><TbCurrencyTaka size={20} />{taxValue}</p>
-                <p className="py-2">Shipping</p><p className="flex items-center justify-end"><TbCurrencyTaka size={20} />{shippingCost}</p>
-                <p className="py-2">Sub Total</p><p className="flex items-center justify-end"><TbCurrencyTaka size={20} />{subTotal + taxValue + parseInt(shippingCost)}</p>
-                <p className="py-2 text-red-500">Discount</p><p className="flex items-center justify-end text-red-500"><TbCurrencyTaka size={20} />{discountValue}</p>
-                <p className="py-4">Total</p><p className="flex items-center justify-end"><TbCurrencyTaka size={20} />{subTotal + taxValue + parseInt(shippingCost) - parseInt(discountValue)}</p>
+                {/* <p className="py-2">Tax {`(GST ${tax}%)`}</p><p className="flex items-center justify-end"><TbCurrencyTaka size={20} />{taxValue}</p> */}
+                {/* <p className="py-2">Shipping</p><p className="flex items-center justify-end"><TbCurrencyTaka size={20} />{shippingCost}</p> */}
+                {/* <p className="py-2">Sub Total</p><p className="flex items-center justify-end"><TbCurrencyTaka size={20} />{subTotal + taxValue + parseInt(shippingCost)}</p> */}
+                <p className="py-2 text-red-500">Discount</p><p className="flex items-center justify-end text-red-500"><TbCurrencyTaka size={20} />{discount}</p>
+                <p className="py-4">Total</p><p className="flex items-center justify-end"><TbCurrencyTaka size={20} />{netTotal}</p>
               </div>
 
               <div className="grid grid-cols-3 gap-3 mt-4">
@@ -479,7 +474,7 @@ export default function POS() {
                 </div>
                 <button
                   onClick={handleSubmit}
-                  className="col-span-3 p-3 my-3 bg-blue-950  text-white rounded-[10px] flex justify-center item-center ">Grand Total : <TbCurrencyTaka size={20} />  {subTotal + taxValue + parseInt(shippingCost) - parseInt(discountValue)} </button>
+                  className="col-span-3 p-3 my-3 bg-blue-950  text-white rounded-[10px] flex justify-center item-center ">Grand Total : <TbCurrencyTaka size={20} />  {netTotal} </button>
               </div>
             </div>
           </div>

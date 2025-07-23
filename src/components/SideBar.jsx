@@ -8,11 +8,14 @@ import { FaChevronRight } from "react-icons/fa6";
 import Image from 'next/image';
 import { FaAnglesLeft } from "react-icons/fa6";
 import { PiInvoice } from "react-icons/pi";
+import { LuLayoutDashboard } from "react-icons/lu";
 
 export default function SideBar({sidebarOpen, sideBarHandle = () => {}}) {
     const [isProductsOpen, setIsProductsOpen] = useState(false);
     const [isSalesOpen, setIsSalesOpen] = useState(false);
     const [collapsed, setCollapsed] = useState(false);
+    const [baseFontColor, setBaseFontColor] = useState("#1F2937")
+    const [baseColor, setBaseColor] = useState("white")
     if(sidebarOpen == true && collapsed == true) {
         setCollapsed(false);
     }
@@ -55,8 +58,7 @@ export default function SideBar({sidebarOpen, sideBarHandle = () => {}}) {
                 {/* Dashboard Link */}
                 <div className="border-b-[1px] border-gray-300 text-gray-800">
                     <Link href="/" className="flex gap-[5px] px-4 py-2 items-center text-[14px] duration-300 hover:bg-gray-200 hover:text-green-700">
-                        <Image src={sideBarIcon.dashboard} alt="icon" height={collapsed ? 25 : 16} width={ collapsed ? 25: 16} />
-                        {collapsed ? '' : "Dashboard"}
+                        <LuLayoutDashboard size={collapsed ? 25 : 20} /> {collapsed ? '' : "Dashboard"}
                     </Link>
                 </div>
 
