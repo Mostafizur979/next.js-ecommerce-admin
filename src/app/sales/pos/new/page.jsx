@@ -23,7 +23,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 export default function POS() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [customer, setCustomer] = useState([])
@@ -238,7 +238,7 @@ export default function POS() {
     <>
       <div className="w-full flex gap-[20px] bg-[#F7F7F7]">
 
-        <SideBar sidebarOpen={isSidebarOpen} sideBarHandle={sideBarHandle} />
+        <SideBar sidebarOpen={isSidebarOpen} defaultCollapsed={collapsed} sideBarHandle={sideBarHandle} />
 
         <div className={`${collapsed ? "w-full ml-[0px] md:ml-[57px]" : "w-full ml-[0px] md:ml-[252px]"} duration-300 ease-in-out`}>
           <div className="md:hidden bg-white my-0 px-4 shadow-sm grid grid-cols-2 items-center sticky top-0 bottom-2  z-40">

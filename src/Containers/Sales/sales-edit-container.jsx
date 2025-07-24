@@ -53,6 +53,8 @@ export default function SalesUpdate() {
     const [selectedShippingAddress, setSelectedShippingAddress] = useState({});
     const [shippingPrice, setShippingPrice] = useState(0);
     const [isSalesDetails, setIsSalesDetails] = useState(false);
+    const [scannedBarcode, setScannedBarcode] = useState('');
+    const [barcodeBuffer, setBarcodeBuffer] = useState('');
     const toggleSidebar = (val) => {
         if (val == "open") {
             setIsSidebarOpen(true);
@@ -178,6 +180,36 @@ export default function SalesUpdate() {
         tempProduct[index].total = (parseFloat(tempProduct[index].price || 0) + parseFloat(tempProduct[index].vat || 0) - parseFloat(tempProduct[index].discount || 0)) * parseInt(tempProduct[index].qty);
         setItems(tempProduct);
     }
+
+    useEffect(() => {
+        let buffer = '';
+        let timeout = null;
+
+        const handleKeyDown = (e) => {
+            if (timeout) clearTimeout(timeout);
+            if (e.key === 'Enter') {
+                setScannedBarcode(buffer);
+                generateBarCode(buffer); 
+                handleProductChange(buffer)
+                buffer = '';
+                return;
+            }
+
+            if (e.key.length === 1) {
+                buffer += e.key;
+            }
+
+            timeout = setTimeout(() => {
+                buffer = '';
+            }, 100); 
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
 
 
     return (
