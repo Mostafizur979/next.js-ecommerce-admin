@@ -23,6 +23,7 @@ import AddCustomerModal from '@/Modal/crm/add-customer-modal';
 import AddShippingAddressModal from '@/Modal/sales/add-shipping-address-modal';
 import getShippingAddress from '@/lib/getShippingAddress';
 import CreateSalesDetailsModal from '@/Modal/sales/create-sales-details-modal';
+import { FaBarcode } from "react-icons/fa";
 function formatDateToDDMMYYYY(dateObj) {
     const day = String(dateObj.getDate()).padStart(2, '0');
     const month = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -104,6 +105,7 @@ export default function SalesUpdate() {
     }, [selectedCustomer, selectedProvider, sync])
 
     const handleProductChange = (productId) => {
+        debugger
         const product = products.find(prod => prod.SKU == productId);
         const isExist = items.find(data => data.id == productId);
         if (isExist?.id == productId) {
@@ -181,7 +183,7 @@ export default function SalesUpdate() {
         setItems(tempProduct);
     }
 
-    useEffect(() => {
+ useEffect(() => {
         let buffer = '';
         let timeout = null;
 
@@ -254,7 +256,11 @@ export default function SalesUpdate() {
                     </div>
                     <div>
                         <div className='grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-5 bg-white p-5 rounded-[10px] shadow-lg'>
-                            <div>
+                            <div className='flex gap-2 items-center'> 
+                                <div className='flex items-center gap-2 mt-4'>
+                                    <input type="checkbox"/>
+                                    <FaBarcode size={24} />
+                                </div>
                                 <CustomReactSelect
                                     label="Product Name"
                                     isRequired={true}

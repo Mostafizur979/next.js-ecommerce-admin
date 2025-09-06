@@ -16,6 +16,8 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import { MdOutlineCloudUpload } from "react-icons/md";
 import getCategories from '../../../lib/getCategories';
 import getSubCategories from '@/lib/getSubCategories';
+import { IoAddCircle } from "react-icons/io5";
+import { MdDelete } from "react-icons/md";
 
 export default function ProductDetails() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -30,6 +32,8 @@ export default function ProductDetails() {
     const maxNumber = 5;
     const [productCategory, setProductCategory] = useState([]);
     const [subCategories, setSubCategories] = useState([]);
+    const [descriptions, setDescriptions] = useState([]);
+    const [counter, setCounter] = useState(1);
     const fetchCategories = async () => {
         const data = await getCategories();
         const SubCategories = await getSubCategories();
@@ -46,9 +50,17 @@ export default function ProductDetails() {
         const value = event.target.value;
         setInputs(values => ({ ...values, [name]: value }))
     }
-    const handleDescription = (e) => {
-        setDescription(e.target.value);
-    }
+    const handleDescription = (idx, name, value) => {
+        setDescriptions((prev) => {
+            const descriptionsData = [...prev]; // copy array
+            descriptionsData[idx] = {
+                ...descriptionsData[idx], // copy object
+                [name]: value,            // update field
+            };
+            return descriptionsData;
+        });
+    };
+
     const toggleSidebar = (val) => {
         setIsSidebarOpen(val === "open");
     };
@@ -136,6 +148,14 @@ export default function ProductDetails() {
         setImages([]);
     }
 
+    const AddMoreDescription = () => {
+        setDescriptions(prev => [...prev, { id: counter,title: "", description: "" }])
+        setCounter(prev => prev+1)
+    }
+
+    const removeDescriptions = (id) => {
+        setDescriptions(descriptions.filter(data => data.id != id))
+    }
 
     return (
         <div className="w-full flex gap-[20px] bg-[#F7F7F7]">
@@ -191,6 +211,7 @@ export default function ProductDetails() {
                                         className="w-[100%] text-[14px] text-gray-600 p-[8px] outline-0 border-[1px] border-gray-200 rounded-[5px]"
                                         required
                                     />
+
                                     {
                                         inputs.pname && inputs.pname.length < 3 && (
                                             <span className="text-red-500 text-[12px]">Name should be greater than 3 letters</span>
@@ -236,7 +257,7 @@ export default function ProductDetails() {
                                         className="w-[100%] text-[14px] text-gray-600 p-[8px] outline-0 border-[1px] border-gray-200 rounded-[5px]"
                                     >
                                         <option value="Select">Select</option>
-                                         {subCategories.map((data, index) => (
+                                        {subCategories.map((data, index) => (
                                             <option key={index} value={data.name}>{data.name}</option>
                                         ))}
                                     </select>
@@ -408,21 +429,49 @@ export default function ProductDetails() {
                             </div>
 
                             <div className={`${isProductDescriptionOpen ? "grid" : "hidden"} w-full  grid-cols-1  gap-[20px] p-[20px] `}>
-                                <div>
-                                    <p className='text-[14px] text-gray-700 flex gap-1'>Description <FaStarOfLife size={8} className='text-red-500' /></p>
-                                    <textarea
-                                        name="description"
-                                        value={description || ""}
-                                        onChange={handleDescription}
-                                        className="w-[100%] h-[200px] text-[14px] text-gray-600 p-[8px] outline-0 border-[1px] border-gray-200 rounded-[5px]"
-                                        required
-                                    />
-                                    {
-                                        description && description.length < 3 && (
-                                            <span className="text-red-500 text-[12px]">Description should be contain more than 3 characters</span>
-                                        )
-                                    }
-                                </div>
+                                <div className='text-[14px] bg-green-100 p-4 flex items-center gap-2 rounded-sm cursor-pointer' onClick={AddMoreDescription}><IoAddCircle size={20} className='text-green-600' />Add More</div>
+                                {
+                                    descriptions.map((data, idx) => (
+                                        <div>
+
+                                            <div>
+                                                <div className=' relative'>
+                                                    <p className='text-[14px] text-gray-700 flex gap-1'>Title<FaStarOfLife size={8} className='text-red-500' /></p>
+                                                    <MdDelete size={24} className='text-red-600 bg-red-200 p-1 rounded-sm cursor-pointer absolute right-0 -top-2' 
+                                                     onClick={removeDescriptions(idx)}
+                                                    />
+                                                </div>
+                                                <textarea
+                                                    name="tile"
+                                                    value={data.title}
+                                                    onChange={(e) => { handleDescription(idx, "title", e.target.value) }}
+                                                    className="w-[100%] ] text-[14px] text-gray-600 p-[8px] outline-0 border-[1px] border-gray-200 rounded-[5px]"
+                                                    required
+                                                />
+                                                {
+                                                    description && description.length < 3 && (
+                                                        <span className="text-red-500 text-[12px]">Description should be contain more than 3 characters</span>
+                                                    )
+                                                }
+                                            </div>
+                                            <div>
+                                                <p className='text-[14px] text-gray-700 flex gap-1'>Description <FaStarOfLife size={8} className='text-red-500' /></p>
+                                                <textarea
+                                                    name="description"
+                                                    value={data.description}
+                                                    onChange={(e) => { handleDescription(idx, "description", e.target.value) }}
+                                                    className="w-[100%] h-[200px] text-[14px] text-gray-600 p-[8px] outline-0 border-[1px] border-gray-200 rounded-[5px]"
+                                                    required
+                                                />
+                                                {
+                                                    description && description.length < 3 && (
+                                                        <span className="text-red-500 text-[12px]">Description should be contain more than 3 characters</span>
+                                                    )
+                                                }
+                                            </div>
+                                        </div>
+                                    ))
+                                }
                             </div>
                         </div>
                         <div className='flex gap-3 justify-end mt-5'>
