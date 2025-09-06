@@ -21,6 +21,9 @@ import { MdDelete } from "react-icons/md";
 import CustomInput from '@/components/CustomInput';
 import CustomReactSelect from '@/components/UI/CustomReactSelect';
 import CustomTextArea from '@/components/UI/CustomTextArea';
+import getProductDetails from '@/lib/getProductDetails';
+import { useSearchParams } from 'next/navigation';
+
 export default function ProductDetails() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [inputs, setInputs] = useState({});
@@ -40,6 +43,9 @@ export default function ProductDetails() {
     const [subCategory, setSubCategory] = useState("");
     const [discountType, setDiscountType] = useState("");
     const [unit, setUnit] = useState("");
+
+    const searchParams = useSearchParams();
+    const id = searchParams.get("id");
 
     const fetchCategories = async () => {
         const categories = await getCategories();
@@ -64,6 +70,36 @@ export default function ProductDetails() {
     useEffect(() => {
         fetchCategories();
     }, []);
+
+    useEffect(() => {
+        if (!id) return;
+        const fetchProduct = async () => {
+            const productData = await getProductDetails(id);
+
+            setInputs({
+                pname: productData[0].Pname || '',
+                sku: productData[0].SKU || '',
+                category: productData[0].Category || '',
+                price: productData[0].Price || '',
+                discountType: productData[0].DiscountType || '',
+                discountValue: productData[0].DiscountValue || '',
+                qtyAlert: productData[0].QtyAlert || '',
+            });
+            setCategory(productData[0].Category || '');
+            setSubCategory(productData[0].SubCategory || '')
+            setUnit(productData[0].unit || '')
+            // Optional: if you want to store the image and description separately
+            let imageList = productData?.[0].assets?.map((data,idx)=>({
+                id: data.id,
+                data_url: data.image_url
+            }))
+            setImages(imageList)
+            setDescriptions(productData[0].descriptions || '');
+        };
+
+        fetchProduct();
+    }, [id]);
+
 
     const handleChange = (event) => {
         debugger
@@ -119,6 +155,7 @@ export default function ProductDetails() {
     }
 
     const onChange = (imageList, addUpdateIndex) => {
+        debugger
         console.log(imageList, addUpdateIndex);
         setImages(imageList);
     };
@@ -126,7 +163,7 @@ export default function ProductDetails() {
     const formSubmit = async (e) => {
         e.preventDefault();
         let imageList = [];
-        images?.map((data,idx)=>{
+        images?.map((data, idx) => {
             imageList.push(data.data_url)
         })
         let descriptionTitle = [];
@@ -180,13 +217,23 @@ export default function ProductDetails() {
         let description = [...descriptions]
         description.push({ id: counter, title: "", description: "" })
         setDescriptions(description)
-        setCounter(prev => prev+1)
+        setCounter(prev => prev + 1)
     }
-
 
     const removeDescriptions = (id) => {
         setDescriptions(descriptions.filter(data => data.id != id))
     }
+
+    const isBase64 = (str) => {
+        return typeof str === 'string' &&
+            /^[A-Za-z0-9+/=\n\r]+$/.test(str) &&
+            str.length > 100; // avoid short non-base64 strings
+    };
+
+    const resolvedSrc =
+        images[0]?.data_url && isBase64(images[0].data_url)
+            ? `data:image/png;base64,${images[0].data_url}`
+            : images[0]?.data_url
 
     return (
         <div className="w-full flex gap-[20px] bg-[#F7F7F7]">
@@ -283,7 +330,7 @@ export default function ProductDetails() {
                                     <CustomReactSelect
                                         label="Unit"
                                         isRequired={true}
-                                        options={[{value: "PCs", label: "PCs"},{value: "KG", label: "KG"},{value: "Package", label: "Package"}]}
+                                        options={[{ value: "PCs", label: "PCs" }, { value: "KG", label: "KG" }, { value: "Package", label: "Package" }]}
                                         handleSelected={(data) => { setUnit(data.value) }} />
                                 </div>
                             </div>
@@ -327,10 +374,10 @@ export default function ProductDetails() {
                                     }
                                 </div>
                                 <div>
-                                  <CustomReactSelect
+                                    <CustomReactSelect
                                         label="Discount Type"
                                         isRequired={true}
-                                        options={[{value: "Percentage", label: "Percentage"},{value: "Fixed", label: "Fixed"}]}
+                                        options={[{ value: "Percentage", label: "Percentage" }, { value: "Fixed", label: "Fixed" }]}
                                         handleSelected={(data) => { setDiscountType(data.value) }} />
                                 </div>
                                 <div>
@@ -430,7 +477,7 @@ export default function ProductDetails() {
 
                             <div className={`${isProductDescriptionOpen ? "grid" : "hidden"} w-full  grid-cols-1  gap-[20px] p-[20px] `}>
                                 <div>
-                                    
+
                                 </div>
                                 <div className='text-[14px] bg-green-100 p-4 flex items-center gap-2 rounded-sm cursor-pointer' onClick={AddMoreDescription}><IoAddCircle size={20} className='text-green-600' />Add More</div>
                                 {
@@ -440,9 +487,9 @@ export default function ProductDetails() {
                                             <div>
                                                 <div className=' relative'>
                                                     <p className='text-[14px] text-gray-700 flex gap-1'>Title<FaStarOfLife size={8} className='text-red-500' /></p>
-                                                   <div className='absolute right-0 -top-2' onClick={()=>{removeDescriptions(data.id)}}>
-                                                     <MdDelete size={24} className='text-red-600 bg-red-200 p-1 rounded-sm cursor-pointer ' />
-                                                   </div>
+                                                    <div className='absolute right-0 -top-2' onClick={() => { removeDescriptions(data.id) }}>
+                                                        <MdDelete size={24} className='text-red-600 bg-red-200 p-1 rounded-sm cursor-pointer ' />
+                                                    </div>
                                                 </div>
                                                 <textarea
                                                     name="tile"

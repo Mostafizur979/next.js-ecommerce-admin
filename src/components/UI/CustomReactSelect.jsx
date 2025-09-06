@@ -1,14 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
 
-export default function SelectComponent({ label = "default label", options, handleSelected, isRequired = false, width = "full" }) {
-  const [isClearable, setIsClearable] = useState(true);
-  const [isSearchable, setIsSearchable] = useState(true);
-  const [isDisabled, setIsDisabled] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isRtl, setIsRtl] = useState(false);
+export default function SelectComponent({
+  label = "default label",
+  options,
+  value = null,          
+  handleSelected,
+  isRequired = false,
+  width = "full"
+}) {
+  const [isClearable] = useState(true);
+  const [isSearchable] = useState(true);
+  const [isDisabled] = useState(false);
+  const [isLoading] = useState(false);
+  const [isRtl] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
-  const [selectedOption, setSelectedOption] = useState(options[0]);
+  const [selectedOption, setSelectedOption] = useState(value || options?.[0]);
+
+
+  useEffect(() => {
+    if (value) {
+      setSelectedOption(value);
+    }
+    else{
+      setSelectedOption(options?.[0])
+    }
+  }, [value]);
 
   const floatLabel = isFocused || (!!selectedOption && selectedOption?.label?.length > 0);
 
@@ -43,8 +60,9 @@ export default function SelectComponent({ label = "default label", options, hand
         isClearable={isClearable}
         isRtl={isRtl}
         isSearchable={isSearchable}
-        name="color"
+        name="select"
         options={options}
+        menuPortalTarget={document.body}
         styles={{
           control: (base, state) => ({
             ...base,
@@ -61,22 +79,32 @@ export default function SelectComponent({ label = "default label", options, hand
             ...base,
             paddingTop: 2
           }),
-          // Change the background of selected item in dropdown
           option: (base, state) => ({
             ...base,
-            backgroundColor: state.isSelected ? '#FE9F43' : state.isFocused ? '#FFF3E0' : undefined,
+            backgroundColor: state.isSelected
+              ? '#FE9F43'
+              : state.isFocused
+              ? '#FFF3E0'
+              : undefined,
             color: state.isSelected ? 'white' : 'black',
             '&:hover': {
               backgroundColor: '#FFF3E0',
               color: 'black',
             },
           }),
-          //  Style the displayed selected value
           singleValue: (base) => ({
             ...base,
             color: 'black',
             padding: '2px 6px',
             borderRadius: '5px',
+          }),
+          menu: (base) => ({
+            ...base,
+            zIndex: 50,
+          }),
+          menuPortal: (base) => ({
+            ...base,
+            zIndex: 50,
           }),
         }}
       />

@@ -3,7 +3,7 @@ import { useState } from "react";
 export default function CustomInput({ width="full", label, name, type = "text", value = "", onChange, placeholder = "", isRequired = false, disabled = false}) {
   const [isFocused, setIsFocused] = useState(false);
 
-  const floatLabel = isFocused || value?.length > 0;
+  const floatLabel = isFocused || (type=="text" && value?.length > 0) || (type=="number" && value > 0) || value?.length > 0;
 
   return (
     <div className={`relative ${width === "full" ? "w-full" : "w-[300px]"} mt-4`}>
@@ -11,7 +11,7 @@ export default function CustomInput({ width="full", label, name, type = "text", 
         <label
           className={`
             absolute left-3 px-1  text-gray-500 transition-all duration-200 
-            ${floatLabel ? "top-[-7px] text-[12px] bg-white" : "top-3 text-sm"}
+            ${floatLabel  ? "top-[-7px] text-[12px] bg-white" : "top-3 text-sm"}
           `}
           onClick={() => setIsFocused(true)}
         >

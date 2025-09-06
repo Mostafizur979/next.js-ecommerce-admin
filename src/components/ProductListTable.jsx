@@ -45,7 +45,7 @@ export default function ProductListTable({ data, index }) {
                         className='p-[5px] border-[1px] border-gray-300 rounded duration-300 hover:bg-[#FE9F43] hover:text-white'>
                         <MdOutlineRemoveRedEye />
                     </Link>
-                    <Link href={{ pathname: "/product/edit/", query: { id: data?.SKU } }}
+                    <Link href={{ pathname: "/product/new/", query: { id: data?.SKU } }}
                         className='p-[5px] border-[1px] border-gray-300 rounded duration-300 hover:bg-[#FE9F43] hover:text-white'>
                         <FaRegEdit />
                     </Link>
