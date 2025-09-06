@@ -18,10 +18,11 @@ import getCategories from '../../../lib/getCategories';
 import getSubCategories from '@/lib/getSubCategories';
 import { IoAddCircle } from "react-icons/io5";
 import { MdDelete } from "react-icons/md";
-
+import CustomInput from '@/components/CustomInput';
+import CustomReactSelect from '@/components/UI/CustomReactSelect';
+import CustomTextArea from '@/components/UI/CustomTextArea';
 export default function ProductDetails() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [product, setProduct] = useState([]);
     const [inputs, setInputs] = useState({});
     const [description, setDescription] = useState("")
     const [isProductInformationOpen, setIsProductInformationOpen] = useState(true);
@@ -30,15 +31,34 @@ export default function ProductDetails() {
     const [isProductDescriptionOpen, setIsProductDescriptionOpen] = useState(true);
     const [images, setImages] = useState([]);
     const maxNumber = 5;
-    const [productCategory, setProductCategory] = useState([]);
-    const [subCategories, setSubCategories] = useState([]);
     const [descriptions, setDescriptions] = useState([]);
     const [counter, setCounter] = useState(1);
+    const [categoryOption, setCategoryOptions] = useState([])
+    const [subCategoryOption, setSubCategoryOption] = useState([])
+
+    const [category, setCategory] = useState("");
+    const [subCategory, setSubCategory] = useState("");
+    const [discountType, setDiscountType] = useState("");
+    const [unit, setUnit] = useState("");
+
     const fetchCategories = async () => {
-        const data = await getCategories();
+        const categories = await getCategories();
         const SubCategories = await getSubCategories();
-        setProductCategory(data)
-        setSubCategories(SubCategories);
+        let data = categories.map((data, idx) => (
+            {
+                value: data.id,
+                label: data.name
+            }
+        ))
+        setCategoryOptions(data)
+        data = SubCategories.map((data, idx) => (
+            {
+                value: data.id,
+                label: data.name
+            }
+        ))
+        setSubCategoryOption(data)
+
     };
 
     useEffect(() => {
@@ -46,6 +66,7 @@ export default function ProductDetails() {
     }, []);
 
     const handleChange = (event) => {
+        debugger
         const name = event.target.name;
         const value = event.target.value;
         setInputs(values => ({ ...values, [name]: value }))
@@ -104,6 +125,13 @@ export default function ProductDetails() {
 
     const formSubmit = async (e) => {
         e.preventDefault();
+        let imageList = [];
+        images?.map((data,idx)=>{
+            imageList.push(data.data_url)
+        })
+        let descriptionTitle = [];
+        let descriptionBody = [];
+
         try {
             const res = await fetch("http://127.0.0.1:8000/api/products/", {
                 method: 'POST',
@@ -113,16 +141,16 @@ export default function ProductDetails() {
                 body: JSON.stringify({
                     pname: inputs.pname,
                     sku: inputs.sku,
-                    category: inputs.category,
-                    subcategory: inputs.subcategory,
-                    unit: inputs.unit,
+                    category: category,
+                    subcategory: subCategory,
+                    unit: unit,
                     qty: inputs.qty,
                     price: inputs.price,
-                    discountType: inputs.discountType,
+                    discountType: discountType,
                     discountValue: inputs.discountValue,
                     qtyAlert: inputs.qtyAlert,
-                    images: images[0]?.data_url,
-                    description: description
+                    images: imageList,
+                    description: descriptions
                 }),
             });
 
@@ -149,9 +177,12 @@ export default function ProductDetails() {
     }
 
     const AddMoreDescription = () => {
-        setDescriptions(prev => [...prev, { id: counter,title: "", description: "" }])
+        let description = [...descriptions]
+        description.push({ id: counter, title: "", description: "" })
+        setDescriptions(description)
         setCounter(prev => prev+1)
     }
+
 
     const removeDescriptions = (id) => {
         setDescriptions(descriptions.filter(data => data.id != id))
@@ -202,14 +233,14 @@ export default function ProductDetails() {
 
                             <div className={`${isProductInformationOpen ? "grid" : "hidden"} w-full  grid-cols-1 lg:grid-cols-2 gap-[20px] p-[20px] `}>
                                 <div>
-                                    <p className='text-[14px] text-gray-700 flex gap-1'>Product Name <FaStarOfLife size={8} className='text-red-500' /></p>
-                                    <input
+                                    <CustomInput
+                                        label="Product Name"
                                         type="text"
                                         name="pname"
                                         value={inputs.pname || ""}
+                                        placeholder=""
                                         onChange={handleChange}
-                                        className="w-[100%] text-[14px] text-gray-600 p-[8px] outline-0 border-[1px] border-gray-200 rounded-[5px]"
-                                        required
+                                        isRequired
                                     />
 
                                     {
@@ -219,14 +250,13 @@ export default function ProductDetails() {
                                     }
                                 </div>
                                 <div>
-                                    <p className='text-[14px] text-gray-700 flex gap-1'>SKU <FaStarOfLife size={8} className='text-red-500' /></p>
-                                    <input
+                                    <CustomInput
+                                        label="SKU"
                                         type="text"
                                         name="sku"
                                         value={inputs.sku || ""}
                                         onChange={handleChange}
-                                        className="w-[100%] text-[14px] text-gray-600 p-[8px] outline-0 border-[1px] border-gray-200 rounded-[5px]"
-                                        required
+                                        isRequired
                                     />
                                     {
                                         inputs.sku && inputs.sku.length < 3 && (
@@ -235,46 +265,26 @@ export default function ProductDetails() {
                                     }
                                 </div>
                                 <div>
-                                    <p className='text-[14px] text-gray-700 flex gap-1'>Category <FaStarOfLife size={8} className='text-red-500' /></p>
-                                    <select
-                                        name="category"
-                                        value={inputs.category || ""}
-                                        onChange={handleChange}
-                                        className="w-[100%] text-[14px] text-gray-600 p-[8px] outline-0 border-[1px] border-gray-200 rounded-[5px]"
-                                    >
-                                        <option value="Select">Select</option>
-                                        {productCategory.map((data, index) => (
-                                            <option key={index} value={data.name}>{data.name}</option>
-                                        ))}
-                                    </select>
+                                    <CustomReactSelect
+                                        label="Category"
+                                        isRequired={true}
+                                        options={categoryOption}
+                                        handleSelected={(data) => { setCategory(data.value) }} />
+
                                 </div>
                                 <div>
-                                    <p className='text-[14px] text-gray-700 flex gap-1'>Sub Category <FaStarOfLife size={8} className='text-red-500' /></p>
-                                    <select
-                                        name="subcategory"
-                                        value={inputs.subcategory || ""}
-                                        onChange={handleChange}
-                                        className="w-[100%] text-[14px] text-gray-600 p-[8px] outline-0 border-[1px] border-gray-200 rounded-[5px]"
-                                    >
-                                        <option value="Select">Select</option>
-                                        {subCategories.map((data, index) => (
-                                            <option key={index} value={data.name}>{data.name}</option>
-                                        ))}
-                                    </select>
+                                    <CustomReactSelect
+                                        label="Sub Category"
+                                        isRequired={true}
+                                        options={subCategoryOption}
+                                        handleSelected={(data) => { setSubCategory(data.value) }} />
                                 </div>
                                 <div>
-                                    <p className='text-[14px] text-gray-700 flex gap-1'>Unit <FaStarOfLife size={8} className='text-red-500' /></p>
-                                    <select
-                                        name="unit"
-                                        value={inputs.unit || ""}
-                                        onChange={handleChange}
-                                        className="w-[100%] text-[14px] text-gray-600 p-[8px] outline-0 border-[1px] border-gray-200 rounded-[5px]"
-                                    >
-                                        <option value="Select">Select</option>
-                                        <option value="PCs">PCs</option>
-                                        <option value="KG">KG</option>
-                                        <option value="Package">Package</option>
-                                    </select>
+                                    <CustomReactSelect
+                                        label="Unit"
+                                        isRequired={true}
+                                        options={[{value: "PCs", label: "PCs"},{value: "KG", label: "KG"},{value: "Package", label: "Package"}]}
+                                        handleSelected={(data) => { setUnit(data.value) }} />
                                 </div>
                             </div>
                         </div>
@@ -287,14 +297,13 @@ export default function ProductDetails() {
 
                             <div className={`${isPricingInformationOpen ? "grid" : "hidden"} w-full  grid-cols-1 lg:grid-cols-2 gap-[20px] p-[20px] `}>
                                 <div>
-                                    <p className='text-[14px] text-gray-700 flex gap-1'>Quantity<FaStarOfLife size={8} className='text-red-500' /></p>
-                                    <input
+                                    <CustomInput
+                                        label="Quantity"
                                         type="number"
                                         name="qty"
                                         value={inputs.qty || ""}
                                         onChange={handleChange}
-                                        className="w-[100%] text-[14px] text-gray-600 p-[8px] outline-0 border-[1px] border-gray-200 rounded-[5px]"
-                                        required
+                                        isRequired
                                     />
                                     {
                                         inputs.qty && inputs.qty < 1 && (
@@ -303,14 +312,13 @@ export default function ProductDetails() {
                                     }
                                 </div>
                                 <div>
-                                    <p className='text-[14px] text-gray-700 flex gap-1'>Price<FaStarOfLife size={8} className='text-red-500' /></p>
-                                    <input
+                                    <CustomInput
+                                        label="Price"
                                         type="number"
                                         name="price"
                                         value={inputs.price || ""}
                                         onChange={handleChange}
-                                        className="w-[100%] text-[14px] text-gray-600 p-[8px] outline-0 border-[1px] border-gray-200 rounded-[5px]"
-                                        required
+                                        isRequired
                                     />
                                     {
                                         inputs.price && inputs.price < 1 && (
@@ -319,27 +327,20 @@ export default function ProductDetails() {
                                     }
                                 </div>
                                 <div>
-                                    <p className='text-[14px] text-gray-700 flex gap-1'>Discount Type <FaStarOfLife size={8} className='text-red-500' /></p>
-                                    <select
-                                        name="discountType"
-                                        value={inputs.discountType || ""}
-                                        onChange={handleChange}
-                                        className="w-[100%] text-[14px] text-gray-600 p-[8px] outline-0 border-[1px] border-gray-200 rounded-[5px]"
-                                    >
-                                        <option value="Select">Select</option>
-                                        <option value="Percentage">Percentage</option>
-                                        <option value="Fixed">Fixed</option>
-                                    </select>
+                                  <CustomReactSelect
+                                        label="Discount Type"
+                                        isRequired={true}
+                                        options={[{value: "Percentage", label: "Percentage"},{value: "Fixed", label: "Fixed"}]}
+                                        handleSelected={(data) => { setDiscountType(data.value) }} />
                                 </div>
                                 <div>
-                                    <p className='text-[14px] text-gray-700 flex gap-1'>Discount Value <FaStarOfLife size={8} className='text-red-500' /></p>
-                                    <input
+                                    <CustomInput
+                                        label="Discount Value"
                                         type="number"
                                         name="discountValue"
-                                        value={inputs.discountValue || ""}
                                         onChange={handleChange}
-                                        className="w-[100%] text-[14px] text-gray-600 p-[8px] outline-0 border-[1px] border-gray-200 rounded-[5px]"
-                                        required
+                                        value={inputs.discountValue || ""}
+                                        isRequired
                                     />
                                     {
                                         inputs.discountvalue && inputs.discountValue < 1 && (
@@ -348,14 +349,13 @@ export default function ProductDetails() {
                                     }
                                 </div>
                                 <div>
-                                    <p className='text-[14px] text-gray-700 flex gap-1'>Quantity Alert <FaStarOfLife size={8} className='text-red-500' /></p>
-                                    <input
+                                    <CustomInput
+                                        label="Quantity Alert"
                                         type="number"
                                         name="qtyAlert"
                                         value={inputs.qtyAlert || ""}
                                         onChange={handleChange}
-                                        className="w-[100%] text-[14px] text-gray-600 p-[8px] outline-0 border-[1px] border-gray-200 rounded-[5px]"
-                                        required
+                                        isRequired
                                     />
                                     {
                                         inputs.qtyAlert && inputs.qtyAlert < 1 && (
@@ -429,6 +429,9 @@ export default function ProductDetails() {
                             </div>
 
                             <div className={`${isProductDescriptionOpen ? "grid" : "hidden"} w-full  grid-cols-1  gap-[20px] p-[20px] `}>
+                                <div>
+                                    
+                                </div>
                                 <div className='text-[14px] bg-green-100 p-4 flex items-center gap-2 rounded-sm cursor-pointer' onClick={AddMoreDescription}><IoAddCircle size={20} className='text-green-600' />Add More</div>
                                 {
                                     descriptions.map((data, idx) => (
@@ -437,9 +440,9 @@ export default function ProductDetails() {
                                             <div>
                                                 <div className=' relative'>
                                                     <p className='text-[14px] text-gray-700 flex gap-1'>Title<FaStarOfLife size={8} className='text-red-500' /></p>
-                                                    <MdDelete size={24} className='text-red-600 bg-red-200 p-1 rounded-sm cursor-pointer absolute right-0 -top-2' 
-                                                     onClick={removeDescriptions(idx)}
-                                                    />
+                                                   <div className='absolute right-0 -top-2' onClick={()=>{removeDescriptions(data.id)}}>
+                                                     <MdDelete size={24} className='text-red-600 bg-red-200 p-1 rounded-sm cursor-pointer ' />
+                                                   </div>
                                                 </div>
                                                 <textarea
                                                     name="tile"
