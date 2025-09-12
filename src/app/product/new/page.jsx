@@ -482,7 +482,7 @@ export default function ProductDetails() {
                                 <div className='text-[14px] bg-green-100 p-4 flex items-center gap-2 rounded-sm cursor-pointer' onClick={AddMoreDescription}><IoAddCircle size={20} className='text-green-600' />Add More</div>
                                 {
                                     descriptions.map((data, idx) => (
-                                        <div>
+                                        <div key={idx}>
 
                                             <div>
                                                 <div className=' relative'>
